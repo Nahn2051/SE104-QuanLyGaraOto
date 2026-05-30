@@ -196,6 +196,12 @@ namespace QuanLyGaraOto.ViewModels
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(MatKhau))
+            {
+                MessageBox.Show("Mật khẩu không được để trống!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
                 using var context = new GaraDbContext();
@@ -215,11 +221,7 @@ namespace QuanLyGaraOto.ViewModels
                     userDb.TenNguoiDung = HoTen.Trim();
                     userDb.MaVaiTro = SelectedVaiTro.MaVaiTro;
 
-                    // Nếu có nhập mật khẩu mới thì mới cập nhật
-                    if (!string.IsNullOrWhiteSpace(MatKhau))
-                    {
-                        userDb.MatKhau = MatKhau;
-                    }
+                    userDb.MatKhau = MatKhau;
 
                     context.SaveChanges();
 

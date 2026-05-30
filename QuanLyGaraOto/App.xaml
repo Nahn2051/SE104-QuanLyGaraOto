@@ -2,8 +2,13 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:QuanLyGaraOto"
+             xmlns:primitives="clr-namespace:System.Windows.Controls.Primitives;assembly=PresentationFramework"
              StartupUri="Views/LoginView.xaml">
     <Application.Resources>
+        <!-- Chặn người dùng gõ phím trực tiếp vào mọi DatePicker trong ứng dụng -->
+        <Style TargetType="primitives:DatePickerTextBox">
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
          
     </Application.Resources>
 </Application>

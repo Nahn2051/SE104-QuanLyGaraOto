@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
 
@@ -15,6 +16,8 @@
         <Color x:Key="BackgroundColor">#F5F7FA</Color>
         <Color x:Key="TextPrimaryColor">#212121</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <converters:StringToNumberConverter x:Key="StringToNumberConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
@@ -115,11 +118,11 @@
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,12">
                         <TextBlock Text="Danh Sách Vật Tư Nhập" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,16,0" />
                         <Button Content="＋ Thêm Dòng" Command="{Binding ThemChiTietCommand}" Background="{StaticResource PrimaryBrush}" Style="{StaticResource ActionButton}" Height="32" Padding="12,0" />
-                        <Button Content="✕ Xóa Dòng" Command="{Binding XoaChiTietCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" Height="32" Padding="12,0" />
+                        <Button Content="✕ Xóa Dòng" Command="{Binding XoaChiTietCommand}" CommandParameter="{Binding SelectedItems, ElementName=dgChiTiet}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" Height="32" Padding="12,0" />
                     </StackPanel>
 
                     <!-- DataGrid Edit Trực Tiếp -->
-                    <DataGrid ItemsSource="{Binding ChiTietNhapKhos}"
+                    <DataGrid x:Name="dgChiTiet" ItemsSource="{Binding ChiTietNhapKhos}"
                               SelectedItem="{Binding SelectedChiTiet}"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False"
@@ -156,7 +159,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <!-- Sử dụng UpdateSourceTrigger=PropertyChanged để tính lại tiền ngay khi gõ -->
-                                        <TextBox Text="{Binding SoLuong, UpdateSourceTrigger=PropertyChanged}" 
+                                        <TextBox Text="{Binding SoLuong, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNumberConverter}}" 
                                                  Margin="4" VerticalContentAlignment="Center" Padding="4,0" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -167,7 +170,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <!-- Sử dụng UpdateSourceTrigger=PropertyChanged để tính lại tiền ngay khi gõ -->
-                                        <TextBox Text="{Binding DonGia, StringFormat=N0, UpdateSourceTrigger=PropertyChanged}" 
+                                        <TextBox Text="{Binding DonGia, StringFormat=N0, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNumberConverter}}" 
                                                  Margin="4" VerticalContentAlignment="Center" Padding="4,0" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

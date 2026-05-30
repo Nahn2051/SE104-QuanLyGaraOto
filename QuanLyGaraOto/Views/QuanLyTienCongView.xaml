@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
 
@@ -17,6 +19,8 @@
         <Color x:Key="TextPrimaryColor">#212121</Color>
         <Color x:Key="TextSecondaryColor">#757575</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <converters:StringToNumberConverter x:Key="StringToNumberConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
@@ -121,6 +125,7 @@
 
                     <DataGrid ItemsSource="{Binding DanhSachTienCong}"
                               SelectedItem="{Binding SelectedTienCong}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                               HeadersVisibility="Column"
@@ -151,6 +156,10 @@
                         </DataGrid.CellStyle>
 
                         <DataGrid.Columns>
+                            <!-- Cột STT liên kết tới Row.Header -->
+                            <DataGridTextColumn Header="STT" 
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" 
+                                                Width="50" />
                             <DataGridTextColumn Header="Mã" Binding="{Binding MaTienCong}" Width="60" />
                             <DataGridTextColumn Header="Tên Tiền Công" Binding="{Binding TenTienCong}" Width="*" />
                             <DataGridTextColumn Header="Đơn Giá (VNĐ)" Binding="{Binding DonGia, StringFormat=N0}" Width="150" Foreground="{StaticResource SuccessBrush}" FontWeight="SemiBold" />
@@ -172,7 +181,7 @@
                     <TextBox Text="{Binding TenTienCong, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" />
 
                     <TextBlock Text="Đơn giá (VNĐ) *" Style="{StaticResource FormLabel}" />
-                    <TextBox Text="{Binding DonGia, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" Style="{StaticResource FormTextBox}" />
+                    <TextBox Text="{Binding DonGia, UpdateSourceTrigger=PropertyChanged, StringFormat=N0, Converter={StaticResource StringToNumberConverter}}" Style="{StaticResource FormTextBox}" />
 
                     <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,10,0,24" />
 
@@ -181,7 +190,7 @@
                     <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
                     <Button Content="✕ Xóa Tiền Công" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
                     
-                    <Button Content="Mới (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
+                    <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
                 </StackPanel>
             </Border>
         </Grid>

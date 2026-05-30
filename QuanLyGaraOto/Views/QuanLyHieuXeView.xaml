@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
 
@@ -137,8 +138,8 @@
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom">
                             <Button Content="＋ Thêm Mới" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" />
                             <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
-                            <Button Content="✕ Xóa" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
-                            <Button Content="Mới (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
+                            <Button Content="✕ Xóa" Command="{Binding XoaCommand}" CommandParameter="{Binding SelectedItems, ElementName=dgHieuXe}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
+                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -152,10 +153,12 @@
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="Danh sách hiệu xe" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
 
-                    <DataGrid ItemsSource="{Binding DanhSachHieuXe}"
+                    <DataGrid x:Name="dgHieuXe" ItemsSource="{Binding DanhSachHieuXe}"
                               SelectedItem="{Binding SelectedHieuXe}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                              SelectionMode="Extended"
                               HeadersVisibility="Column"
                               GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
                               BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
@@ -184,6 +187,10 @@
                         </DataGrid.CellStyle>
 
                         <DataGrid.Columns>
+                            <!-- Cột STT liên kết tới Row.Header siêu chuẩn và chống lỗi -->
+                            <DataGridTextColumn Header="STT" 
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" 
+                                                Width="50" />
                             <DataGridTextColumn Header="Mã Hiệu Xe" Binding="{Binding MaHieuXe}" Width="150" />
                             <DataGridTextColumn Header="Tên Hiệu Xe" Binding="{Binding TenHieuXe}" Width="*" />
                         </DataGrid.Columns>

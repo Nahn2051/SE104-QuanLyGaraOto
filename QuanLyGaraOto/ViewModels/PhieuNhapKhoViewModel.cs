@@ -47,7 +47,7 @@ namespace QuanLyGaraOto.ViewModels
         // =====================================================================
 
         public RelayCommand ThemChiTietCommand { get; }
-        public RelayCommand XoaChiTietCommand { get; }
+        public RelayCommand<System.Collections.IList> XoaChiTietCommand { get; }
         public RelayCommand LuuPhieuNhapCommand { get; }
 
         // =====================================================================
@@ -57,7 +57,7 @@ namespace QuanLyGaraOto.ViewModels
         public PhieuNhapKhoViewModel()
         {
             ThemChiTietCommand = new RelayCommand(ThemChiTiet);
-            XoaChiTietCommand = new RelayCommand(XoaChiTiet, () => SelectedChiTiet != null);
+            XoaChiTietCommand = new RelayCommand<System.Collections.IList>(XoaChiTiet, (items) => items != null && items.Count > 0);
             LuuPhieuNhapCommand = new RelayCommand(LuuPhieuNhap, CanLuuPhieu);
 
             LoadDuLieu();
@@ -92,14 +92,17 @@ namespace QuanLyGaraOto.ViewModels
             ChiTietNhapKhos.Add(row);
         }
 
-        private void XoaChiTiet()
+        private void XoaChiTiet(System.Collections.IList? items)
         {
-            if (SelectedChiTiet != null)
+            if (items == null || items.Count == 0) return;
+
+            var list = items.Cast<ChiTietPhieuNhapRow>().ToList();
+            foreach (var item in list)
             {
-                ChiTietNhapKhos.Remove(SelectedChiTiet);
-                SelectedChiTiet = null;
-                TinhTongTien();
+                ChiTietNhapKhos.Remove(item);
             }
+            SelectedChiTiet = null;
+            TinhTongTien();
         }
 
         private void TinhTongTien()
@@ -132,6 +135,12 @@ namespace QuanLyGaraOto.ViewModels
                     MessageBox.Show("Đơn giá nhập phải lớn hơn 0!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+            }
+
+            if (NgayNhap.Date > DateTime.Now.Date)
+            {
+                MessageBox.Show("Ngày nhập kho không được lớn hơn ngày hiện tại!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
             try

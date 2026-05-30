@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
     
@@ -142,6 +143,7 @@
                     
                     <DataGrid ItemsSource="{Binding DanhSachVatTu}"
                               SelectedItem="{Binding SelectedVatTu}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False"
                               HeadersVisibility="Column"
@@ -172,6 +174,10 @@
                             </Style>
                         </DataGrid.CellStyle>
                         <DataGrid.Columns>
+                            <!-- Cột STT -->
+                            <DataGridTextColumn Header="STT" 
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" 
+                                                Width="50" />
                             <DataGridTextColumn Header="Mã" Binding="{Binding MaVTPT}" Width="60" IsReadOnly="True" />
                             <DataGridTextColumn Header="Tên vật tư" Binding="{Binding TenVTPT}" Width="*" IsReadOnly="True" />
                             <DataGridTextColumn Header="Đơn giá nhập" Binding="{Binding DonGia, StringFormat=N0}" Width="120" IsReadOnly="True" />
@@ -201,10 +207,10 @@
                     <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,8,0,24" />
 
                     <WrapPanel HorizontalAlignment="Center">
-                        <Button Content="＋ Thêm" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" Width="90"/>
-                        <Button Content="✎ Sửa" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" Width="90"/>
-                        <Button Content="✕ Xóa" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" Width="90"/>
-                        <Button Content="Mới" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" Width="80"/>
+                        <Button Content="＋ Thêm" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" />
+                        <Button Content="✎ Sửa" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
+                        <Button Content="✕ Xóa" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
+                        <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0"/>
                     </WrapPanel>
                 </StackPanel>
             </Border>

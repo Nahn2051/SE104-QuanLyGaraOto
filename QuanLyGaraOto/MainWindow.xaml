@@ -34,6 +34,14 @@
             <views:TraCuuXeView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewmodels:TraCuuPhieuSuaChuaViewModel}">
+            <views:TraCuuPhieuSuaChuaView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type viewmodels:TraCuuPhieuNhapKhoViewModel}">
+            <views:TraCuuPhieuNhapKhoView />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewmodels:BaoCaoDoanhSoViewModel}">
             <views:BaoCaoDoanhSoView />
         </DataTemplate>
@@ -211,6 +219,17 @@
                         <Button Content="🔍  Tra cứu xe"
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowTraCuuXeCommand}" />
+
+                        <!-- ───── TRA CỨU ───── -->
+                        <TextBlock Text="TRA CỨU LỊCH SỬ" Style="{StaticResource SectionHeader}" />
+
+                        <Button Content="📄  Lịch sử sửa chữa"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowTraCuuPhieuSuaChuaCommand}" />
+
+                        <Button Content="📥  Lịch sử nhập kho"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowTraCuuPhieuNhapKhoCommand}" />
 
                         <!-- ───── BÁO CÁO ───── -->
                         <TextBlock Text="BÁO CÁO" Style="{StaticResource SectionHeader}" />

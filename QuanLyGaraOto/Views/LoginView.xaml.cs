@@ -15,6 +15,8 @@ namespace QuanLyGaraOto.Views
             Loaded += (_, _) => UsernameBox.Focus();
         }
 
+        private bool _isUpdatingPassword = false;
+
         /// <summary>
         /// Truyền password từ PasswordBox vào ViewModel.
         /// WPF không hỗ trợ bind trực tiếp PasswordBox.Password vì lý do bảo mật,
@@ -22,9 +24,36 @@ namespace QuanLyGaraOto.Views
         /// </summary>
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (_isUpdatingPassword) return;
+            _isUpdatingPassword = true;
+
             if (DataContext is LoginViewModel vm)
             {
                 vm.Password = PasswordBox.Password;
+            }
+            if (VisiblePasswordBox.Text != PasswordBox.Password)
+            {
+                VisiblePasswordBox.Text = PasswordBox.Password;
+            }
+
+            _isUpdatingPassword = false;
+        }
+
+        private void chkShowPassword_Changed(object sender, RoutedEventArgs e)
+        {
+            if (chkShowPassword.IsChecked == true)
+            {
+                PasswordBox.Visibility = Visibility.Collapsed;
+                VisiblePasswordBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                _isUpdatingPassword = true;
+                PasswordBox.Password = VisiblePasswordBox.Text;
+                _isUpdatingPassword = false;
+
+                PasswordBox.Visibility = Visibility.Visible;
+                VisiblePasswordBox.Visibility = Visibility.Collapsed;
             }
         }
 

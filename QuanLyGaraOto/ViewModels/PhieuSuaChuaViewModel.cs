@@ -83,7 +83,7 @@ namespace QuanLyGaraOto.ViewModels
         // =====================================================================
 
         public RelayCommand ThemChiTietCommand { get; }
-        public RelayCommand XoaChiTietCommand { get; }
+        public RelayCommand<System.Collections.IList> XoaChiTietCommand { get; }
         public RelayCommand LuuPhieuCommand { get; }
 
         // =====================================================================
@@ -94,9 +94,9 @@ namespace QuanLyGaraOto.ViewModels
         {
             ThemChiTietCommand = new RelayCommand(ThemChiTiet);
 
-            XoaChiTietCommand = new RelayCommand(
+            XoaChiTietCommand = new RelayCommand<System.Collections.IList>(
                 execute: XoaChiTiet,
-                canExecute: () => SelectedChiTiet is not null
+                canExecute: (items) => items != null && items.Count > 0
             );
 
             LuuPhieuCommand = new RelayCommand(
@@ -157,14 +157,19 @@ namespace QuanLyGaraOto.ViewModels
         // Command: Xóa dòng chi tiết đang chọn
         // =====================================================================
 
-        private void XoaChiTiet()
+        private void XoaChiTiet(System.Collections.IList? items)
         {
-            if (SelectedChiTiet is not null)
+            if (items == null || items.Count == 0) return;
+
+            // Chuyển sang list để tránh lỗi CollectionModifiedException khi xóa
+            var list = items.Cast<ChiTietPhieuSuaChuaRow>().ToList();
+            foreach (var item in list)
             {
-                ChiTietSuaChuas.Remove(SelectedChiTiet);
-                SelectedChiTiet = null;
-                TinhTongTien();
+                ChiTietSuaChuas.Remove(item);
             }
+            
+            SelectedChiTiet = null;
+            TinhTongTien();
         }
 
         // =====================================================================
@@ -191,6 +196,20 @@ namespace QuanLyGaraOto.ViewModels
                 return;
             }
 
+            if (NgaySuaChua.Date > DateTime.Now.Date)
+            {
+                MessageBox.Show("Ngày sửa chữa không được lớn hơn ngày hiện tại!", "Lỗi ngày tháng",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (SelectedXe.NgayTiepNhan.HasValue && NgaySuaChua.Date < SelectedXe.NgayTiepNhan.Value.Date)
+            {
+                MessageBox.Show($"Ngày sửa chữa không được nhỏ hơn ngày tiếp nhận xe ({SelectedXe.NgayTiepNhan.Value:dd/MM/yyyy})!", "Lỗi ngày tháng",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             if (ChiTietSuaChuas.Count == 0)
             {
                 MessageBox.Show("Vui lòng thêm ít nhất 1 chi tiết sửa chữa!", "Cảnh báo",
@@ -198,7 +217,7 @@ namespace QuanLyGaraOto.ViewModels
                 return;
             }
 
-            // Kiểm tra mỗi dòng chi tiết phải có nội dung
+            // Kiểm tra mỗi dòng chi tiết
             foreach (var ct in ChiTietSuaChuas)
             {
                 if (string.IsNullOrWhiteSpace(ct.NoiDungSuaChua))
@@ -207,6 +226,20 @@ namespace QuanLyGaraOto.ViewModels
                         "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                
+                if (ct.SelectedVatTu == null && ct.SelectedTienCong == null)
+                {
+                    MessageBox.Show("Mỗi dòng chi tiết phải chọn ít nhất một Vật tư hoặc một Loại tiền công!",
+                        "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            if (SoTienTra > TongTien)
+            {
+                MessageBox.Show("Số tiền trả không được vượt quá Tổng tiền của phiếu sửa chữa!",
+                    "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
             try

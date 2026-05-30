@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
 
@@ -12,6 +14,10 @@
         <Color x:Key="BackgroundColor">#F5F7FA</Color>
         <Color x:Key="TextPrimaryColor">#212121</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <!-- Converters -->
+        <converters:BienSoConverter x:Key="BienSoConverter" />
+        <converters:RowToIndexConverter x:Key="RowToIndexConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
@@ -90,6 +96,7 @@
                     <TextBlock DockPanel.Dock="Top" Text="Kết quả tra cứu" FontSize="15" FontWeight="SemiBold" Foreground="#757575" Margin="0,0,0,12" />
 
                     <DataGrid ItemsSource="{Binding DanhSachXe}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                               HeadersVisibility="Column"
@@ -120,7 +127,15 @@
                         </DataGrid.CellStyle>
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Biển số" Binding="{Binding BienSo}" Width="*" />
+                            <!-- Cột STT liên kết tới Row.Header siêu chuẩn và chống lỗi -->
+                            <DataGridTextColumn Header="STT" 
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" 
+                                                Width="50" />
+
+                            <!-- Cột Biển số dùng BienSoConverter -->
+                            <DataGridTextColumn Header="Biển số" 
+                                                Binding="{Binding BienSo, Converter={StaticResource BienSoConverter}}" 
+                                                Width="*" FontWeight="Bold" />
                             
                             <!-- Bind theo Navigation Property HieuXe.TenHieuXe -->
                             <DataGridTextColumn Header="Hiệu xe" Binding="{Binding HieuXe.TenHieuXe}" Width="*" />

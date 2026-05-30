@@ -13,6 +13,9 @@ namespace QuanLyGaraOto.Models
         [Required]
         public DateTime NgayNhap { get; set; }
 
+        [NotMapped]
+        public decimal TongTien => DanhSachCTPhieuNhap?.Sum(ct => ct.ThanhTien) ?? 0;
+
         // Navigation properties
         public virtual ICollection<ChiTietPhieuNhap> DanhSachCTPhieuNhap { get; set; } = new List<ChiTietPhieuNhap>();
     }

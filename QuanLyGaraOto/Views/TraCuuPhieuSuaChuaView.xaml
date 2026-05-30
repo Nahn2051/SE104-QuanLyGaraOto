@@ -1,0 +1,180 @@
+<UserControl x:Class="QuanLyGaraOto.Views.TraCuuPhieuSuaChuaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Color x:Key="PrimaryColor">#1565C0</Color>
+        <Color x:Key="SurfaceColor">#FFFFFF</Color>
+        <Color x:Key="BackgroundColor">#F5F7FA</Color>
+        <Color x:Key="TextPrimaryColor">#212121</Color>
+        <Color x:Key="TextSecondaryColor">#757575</Color>
+        <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+        <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Border Background="{StaticResource BackgroundBrush}" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="24">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#000" BlurRadius="12" ShadowDepth="1" Opacity="0.05" Direction="270" />
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="🔍 TRA CỨU PHIẾU SỬA CHỮA" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,16" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
+                                     Height="44" FontSize="15" Padding="16,0" 
+                                     VerticalContentAlignment="Center" Background="#F8F9FA" 
+                                     BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5" />
+
+                            <Button Grid.Column="2" Content="🔍 Tìm Kiếm" Command="{Binding TimKiemCommand}" 
+                                    Height="44" Padding="24,0" FontSize="15" FontWeight="Bold" 
+                                    Foreground="White" Background="{StaticResource PrimaryBrush}" 
+                                    BorderThickness="0" Cursor="Hand" />
+                        </Grid>
+                        <TextBlock Text="Mẹo: Tìm theo mã phiếu hoặc biển số xe." 
+                                   FontSize="12" Foreground="#9E9E9E" Margin="0,8,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#000" BlurRadius="10" ShadowDepth="1" Opacity="0.05" Direction="270" />
+                    </Border.Effect>
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="Lịch sử phiếu sửa chữa (Nháy đúp để xem chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="#757575" Margin="0,0,0,12" />
+
+                        <DataGrid ItemsSource="{Binding DanhSachPhieu}"
+                                  SelectedItem="{Binding SelectedPhieu}"
+                                  behaviors:DataGridBehavior.AutoNumber="True"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
+                                  BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                  RowHeight="42" ColumnHeaderHeight="42"
+                                  Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
+                            <DataGrid.InputBindings>
+                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding XemChiTietCommand}" />
+                            </DataGrid.InputBindings>
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F5F7FA" />
+                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Padding" Value="10,0" />
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Padding" Value="10,0" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#E3F2FD" />
+                                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
+                                <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding MaPhieuSuaChua}" Width="100" FontWeight="Bold" />
+                                <DataGridTextColumn Header="Biển số xe" Binding="{Binding Xe.BienSo}" Width="150" FontWeight="Bold" />
+                                <DataGridTextColumn Header="Ngày Sửa Chữa" Binding="{Binding NgaySuaChua, StringFormat=dd/MM/yyyy HH:mm}" Width="*" />
+                                <DataGridTextColumn Header="Tổng Tiền" Binding="{Binding TongTien, StringFormat=N0}" Width="150" Foreground="#2E7D32" FontWeight="Bold" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- DIALOG XEM CHI TIẾT -->
+        <Grid Visibility="{Binding IsPopupOpen, Converter={StaticResource BoolToVis}}" Background="#80000000" Panel.ZIndex="100">
+            <Border Background="White" CornerRadius="16" Width="800" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24">
+                <Border.Effect>
+                    <DropShadowEffect Color="Black" BlurRadius="30" Opacity="0.3" ShadowDepth="5" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="16" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="16" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Text="Chi Tiết Phiếu Sửa Chữa" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
+                        <TextBlock Text="{Binding SelectedPhieu.MaPhieuSuaChua, StringFormat=Mã phiếu: {0}}" FontSize="14" Foreground="#757575" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding ChiTietPhieu}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
+                              BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                              RowHeight="42" ColumnHeaderHeight="42"
+                              Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#F5F7FA" />
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="Padding" Value="10,0" />
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="10,0" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
+                            <DataGridTextColumn Header="Nội Dung" Binding="{Binding NoiDungSuaChua}" Width="2*" />
+                            <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVatTu}" Width="1.5*" />
+                            <DataGridTextColumn Header="SL" Binding="{Binding SoLuong}" Width="60" />
+                            <DataGridTextColumn Header="Đơn Giá" Binding="{Binding DonGia, StringFormat=N0}" Width="1*" />
+                            <DataGridTextColumn Header="Tiền Công" Binding="{Binding TienCong.TenTienCong}" Width="1.5*" />
+                            <DataGridTextColumn Header="Thành Tiền" Binding="{Binding ThanhTien, StringFormat=N0}" Width="1*" FontWeight="Bold" Foreground="#2E7D32"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <Button Grid.Row="4" Content="Đóng" Command="{Binding DongChiTietCommand}" 
+                            HorizontalAlignment="Right" Width="120" Height="40" Background="#9E9E9E" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

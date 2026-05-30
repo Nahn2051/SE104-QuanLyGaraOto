@@ -104,6 +104,33 @@ namespace QuanLyGaraOto.ViewModels
                     return;
                 }
 
+                if (NgayThuTien.Date > DateTime.Now.Date)
+                {
+                    MessageBox.Show("Ngày thu tiền không được lớn hơn ngày hiện tại!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Lấy ngày sửa chữa gần nhất
+                var ngaySuaChuaGanNhat = context.PhieuSuaChuas
+                    .Where(p => p.MaXe == xe.MaXe)
+                    .OrderByDescending(p => p.NgaySuaChua)
+                    .Select(p => p.NgaySuaChua)
+                    .FirstOrDefault();
+
+                if (ngaySuaChuaGanNhat != default)
+                {
+                    if (NgayThuTien.Date < ngaySuaChuaGanNhat.Date)
+                    {
+                        MessageBox.Show($"Ngày thu tiền không được nhỏ hơn ngày sửa chữa gần nhất ({ngaySuaChuaGanNhat:dd/MM/yyyy})!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+                else if (xe.NgayTiepNhan.HasValue && NgayThuTien.Date < xe.NgayTiepNhan.Value.Date)
+                {
+                    MessageBox.Show($"Ngày thu tiền không được nhỏ hơn ngày tiếp nhận xe ({xe.NgayTiepNhan.Value:dd/MM/yyyy})!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // Kiểm tra quy định số tiền thu <= tiền nợ
                 if (apDungKiemTra && SoTienThu > xe.TienNo)
                 {

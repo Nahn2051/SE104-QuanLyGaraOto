@@ -53,7 +53,7 @@ namespace QuanLyGaraOto.ViewModels
 
         public RelayCommand ThemCommand { get; }
         public RelayCommand SuaCommand { get; }
-        public RelayCommand XoaCommand { get; }
+        public RelayCommand<System.Collections.IList> XoaCommand { get; }
         public RelayCommand ClearFormCommand { get; }
 
         // =====================================================================
@@ -64,7 +64,7 @@ namespace QuanLyGaraOto.ViewModels
         {
             ThemCommand = new RelayCommand(Them, CanThemSua);
             SuaCommand = new RelayCommand(Sua, CanSuaXoa);
-            XoaCommand = new RelayCommand(Xoa, CanSuaXoa);
+            XoaCommand = new RelayCommand<System.Collections.IList>(Xoa, CanSuaXoaList);
             ClearFormCommand = new RelayCommand(ClearForm);
 
             LoadData();
@@ -94,6 +94,7 @@ namespace QuanLyGaraOto.ViewModels
 
         private bool CanThemSua() => !string.IsNullOrWhiteSpace(TenHieuXe);
         private bool CanSuaXoa() => SelectedHieuXe != null && !string.IsNullOrWhiteSpace(TenHieuXe);
+        private bool CanSuaXoaList(System.Collections.IList? items) => items != null && items.Count > 0;
 
         private void ClearForm()
         {
@@ -167,33 +168,40 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
-        private void Xoa()
+        private void Xoa(System.Collections.IList? items)
         {
-            if (SelectedHieuXe == null) return;
+            if (items == null || items.Count == 0) return;
 
-            var result = MessageBox.Show($"Bạn có chắc chắn muốn xóa hiệu xe '{SelectedHieuXe.TenHieuXe}'?",
+            var list = items.Cast<HieuXe>().ToList();
+            var result = MessageBox.Show($"Bạn có chắc chắn muốn xóa {list.Count} hiệu xe đã chọn?",
                                          "Xác nhận xóa", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
 
             try
             {
                 using var context = new GaraDbContext();
-                var hxToDelete = context.HieuXes.Find(SelectedHieuXe.MaHieuXe);
+                int successCount = 0;
                 
-                if (hxToDelete != null)
+                foreach (var hx in list)
                 {
-                    context.HieuXes.Remove(hxToDelete);
-                    context.SaveChanges();
-                    
-                    MessageBox.Show("Xóa hiệu xe thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadData();
-                    ClearForm();
+                    var hxToDelete = context.HieuXes.Find(hx.MaHieuXe);
+                    if (hxToDelete != null)
+                    {
+                        context.HieuXes.Remove(hxToDelete);
+                        successCount++;
+                    }
                 }
+                
+                context.SaveChanges();
+                
+                MessageBox.Show($"Đã xóa thành công {successCount} hiệu xe!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadData();
+                ClearForm();
             }
             catch (DbUpdateException)
             {
-                // Đây là lỗi do dính khóa ngoại (Foreign Key Constraint)
-                MessageBox.Show("Không thể xóa hiệu xe này vì đã có Xe sử dụng!\nVui lòng kiểm tra lại danh sách Xe.", 
+                // Lỗi do dính khóa ngoại (Foreign Key Constraint)
+                MessageBox.Show("Không thể xóa một số hiệu xe vì đã có Xe sử dụng!\nVui lòng kiểm tra lại danh sách Xe.", 
                                 "Lỗi ràng buộc dữ liệu", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)

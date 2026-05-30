@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="850">
 
@@ -20,6 +21,8 @@
         <Color x:Key="TextPrimaryColor">#212121</Color>
         <Color x:Key="TextSecondaryColor">#757575</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <converters:StringToNumberConverter x:Key="StringToNumberConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}" />
@@ -252,7 +255,7 @@
                         <TextBlock Text="Số tiền trả (VNĐ)" Style="{StaticResource FormLabel}" />
                         <TextBox Style="{StaticResource FormTextBox}"
                                  Text="{Binding SoTienTra, UpdateSourceTrigger=PropertyChanged,
-                                        StringFormat=N0}" />
+                                        StringFormat=N0, Converter={StaticResource StringToNumberConverter}}" />
                     </StackPanel>
                 </Grid>
             </Border>
@@ -290,19 +293,20 @@
                             <Button Content="✕ Xóa dòng"
                                     Style="{StaticResource ActionButton}"
                                     Background="{StaticResource DangerBrush}"
-                                    Command="{Binding XoaChiTietCommand}" />
+                                    Command="{Binding XoaChiTietCommand}"
+                                    CommandParameter="{Binding SelectedItems, ElementName=dgChiTiet}" />
                         </StackPanel>
                     </DockPanel>
 
                     <!-- DataGrid -->
-                    <DataGrid Grid.Row="1"
+                    <DataGrid x:Name="dgChiTiet" Grid.Row="1"
                               ItemsSource="{Binding ChiTietSuaChuas}"
                               SelectedItem="{Binding SelectedChiTiet}"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               CanUserSortColumns="False"
-                              SelectionMode="Single"
+                              SelectionMode="Extended"
                               HeadersVisibility="Column"
                               GridLinesVisibility="Horizontal"
                               HorizontalGridLinesBrush="#ECEFF1"
@@ -392,7 +396,7 @@
                             <!-- Số lượng -->
                             <DataGridTextColumn Header="SL" Width="60"
                                                 Binding="{Binding SoLuong,
-                                                          UpdateSourceTrigger=PropertyChanged}" />
+                                                          UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNumberConverter}}" />
 
                             <!-- Đơn giá (read-only, tự hiện khi chọn vật tư) -->
                             <DataGridTextColumn Header="Đơn giá" Width="110" IsReadOnly="True"

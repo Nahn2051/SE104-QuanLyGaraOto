@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="750">
 
@@ -20,6 +21,10 @@
         <Color x:Key="TextSecondaryColor">#757575</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
         <Color x:Key="ErrorColor">#E53935</Color>
+
+        <!-- Converters -->
+        <converters:BienSoConverter x:Key="BienSoConverter" />
+        <converters:RowToIndexConverter x:Key="RowToIndexConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{StaticResource PrimaryDarkColor}" />
@@ -238,11 +243,12 @@
                             <Run Style="{StaticResource RequiredMarker}" />
                         </TextBlock>
                         <TextBox Style="{StaticResource FormTextBox}"
+                                 CharacterCasing="Upper"
                                  Text="{Binding BienSo, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
 
                     <!-- ───── Hiệu xe (Required) ───── -->
-                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,16">
                         <TextBlock Style="{StaticResource FormLabel}">
                             <Run Text="Hiệu xe" />
                             <Run Style="{StaticResource RequiredMarker}" />
@@ -253,8 +259,22 @@
                                   DisplayMemberPath="TenHieuXe" />
                     </StackPanel>
 
+                    <!-- ───── Ngày tiếp nhận ───── -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,0,16">
+                        <TextBlock Text="Ngày tiếp nhận" Style="{StaticResource FormLabel}" />
+                        <DatePicker Height="42" FontSize="14" Padding="8,8"
+                                    SelectedDate="{Binding NgayTiepNhan}"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5">
+                            <DatePicker.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="8" />
+                                </Style>
+                            </DatePicker.Resources>
+                        </DatePicker>
+                    </StackPanel>
+
                     <!-- ───── Tên chủ xe (Required) ───── -->
-                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,16">
+                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,16">
                         <TextBlock Style="{StaticResource FormLabel}">
                             <Run Text="Tên chủ xe" />
                             <Run Style="{StaticResource RequiredMarker}" />
@@ -272,7 +292,7 @@
                     </StackPanel>
 
                     <!-- ───── Địa chỉ (full width) ───── -->
-                    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                                 Margin="0,0,0,16">
                         <TextBlock Text="Địa chỉ"
                                    Style="{StaticResource FormLabel}" />
@@ -281,7 +301,7 @@
                     </StackPanel>
 
                     <!-- ───── Email (full width) ───── -->
-                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
                                 Margin="0,0,0,8">
                         <TextBlock Text="Email"
                                    Style="{StaticResource FormLabel}" />

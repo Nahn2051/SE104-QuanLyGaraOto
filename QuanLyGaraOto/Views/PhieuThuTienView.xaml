@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:QuanLyGaraOto.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
     
@@ -17,6 +18,8 @@
         <Color x:Key="TextPrimaryColor">#212121</Color>
         <Color x:Key="TextSecondaryColor">#757575</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
+
+        <converters:StringToNumberConverter x:Key="StringToNumberConverter" />
 
         <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
         <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
@@ -171,7 +174,7 @@
                                 <Run Text=" *" Foreground="{StaticResource DangerBrush}" />
                             </TextBlock>
                             <TextBox Style="{StaticResource FormTextBox}" 
-                                     Text="{Binding SoTienThu, UpdateSourceTrigger=PropertyChanged, StringFormat=N0}" />
+                                     Text="{Binding SoTienThu, UpdateSourceTrigger=PropertyChanged, StringFormat=N0, Converter={StaticResource StringToNumberConverter}}" />
                             
                         </StackPanel>
                     </Grid>

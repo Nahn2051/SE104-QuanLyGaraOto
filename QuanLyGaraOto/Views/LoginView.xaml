@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Đăng Nhập — Quản Lý Gara Oto"
-        Height="580" Width="460"
+        Height="640" Width="460"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -274,21 +274,33 @@
                 <TextBlock Text="Mật khẩu" FontSize="13" FontWeight="SemiBold"
                            Foreground="{StaticResource TextPrimaryBrush}"
                            Margin="4,0,0,8" />
-                <PasswordBox x:Name="PasswordBox"
-                             Height="48" Padding="16,12" FontSize="14"
-                             Margin="0,0,0,28"
-                             PasswordChanged="PasswordBox_PasswordChanged">
-                    <PasswordBox.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="12" />
-                        </Style>
-                    </PasswordBox.Resources>
-                </PasswordBox>
+                <Grid Margin="0,0,0,8">
+                    <TextBox x:Name="VisiblePasswordBox"
+                             Style="{StaticResource LoginTextBox}"
+                             Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                             Visibility="Collapsed" />
+                    <PasswordBox x:Name="PasswordBox"
+                                 Height="48" Padding="16,12" FontSize="14"
+                                 PasswordChanged="PasswordBox_PasswordChanged">
+                        <PasswordBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="12" />
+                            </Style>
+                        </PasswordBox.Resources>
+                    </PasswordBox>
+                </Grid>
+                
+                <CheckBox x:Name="chkShowPassword" Content="Hiển thị mật khẩu" 
+                          Margin="4,0,0,24" 
+                          Foreground="{StaticResource TextSecondaryBrush}"
+                          Checked="chkShowPassword_Changed" 
+                          Unchecked="chkShowPassword_Changed" />
 
                 <!-- ───── Login Button ───── -->
                 <Button Content="Đăng Nhập"
                         Style="{StaticResource LoginButton}"
-                        Command="{Binding LoginCommand}" />
+                        Command="{Binding LoginCommand}" 
+                        IsDefault="True" />
             </StackPanel>
 
         </Grid>

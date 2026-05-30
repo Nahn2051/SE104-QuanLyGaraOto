@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
 
@@ -61,6 +62,34 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="FormPasswordBox" TargetType="PasswordBox">
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+            <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1.5" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="PasswordBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+                                <Setter TargetName="border" Property="BorderThickness" Value="2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
 
         <Style x:Key="FormComboBox" TargetType="ComboBox">
             <Setter Property="Height" Value="40" />
@@ -143,7 +172,11 @@
                             <TextBox Text="{Binding TenDangNhap, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" />
                             
                             <TextBlock Text="Mật khẩu *" Style="{StaticResource FormLabel}" />
-                            <TextBox Text="{Binding MatKhau, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" ToolTip="Để trống nếu không muốn đổi mật khẩu khi Sửa" />
+                            <Grid>
+                                <TextBox x:Name="txtMatKhauVisible" Text="{Binding MatKhau, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Visibility="Collapsed" />
+                                <PasswordBox x:Name="txtMatKhauHidden" Style="{StaticResource FormPasswordBox}" PasswordChar="*" PasswordChanged="txtMatKhauHidden_PasswordChanged" />
+                            </Grid>
+                            <CheckBox x:Name="chkShowPassword" Content="Hiển thị mật khẩu" Margin="0,4,0,0" Checked="chkShowPassword_Changed" Unchecked="chkShowPassword_Changed" />
                         </StackPanel>
 
                         <!-- Cột 2 -->
@@ -155,7 +188,7 @@
                             <ComboBox ItemsSource="{Binding DanhSachVaiTro}" 
                                       SelectedItem="{Binding SelectedVaiTro}" 
                                       DisplayMemberPath="TenVaiTro" 
-                                      Style="{StaticResource FormComboBox}" />
+                                      Style="{StaticResource FormComboBox}" VerticalContentAlignment="Center" />
                         </StackPanel>
 
                         <!-- Cột 3: Nút bấm -->
@@ -163,7 +196,7 @@
                             <Button Content="＋ Thêm Mới" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
                             <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
                             <Button Content="✕ Xóa User" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
-                            <Button Content="Mới (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
+                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>
@@ -179,6 +212,7 @@
 
                     <DataGrid ItemsSource="{Binding DanhSachNguoiDung}"
                               SelectedItem="{Binding SelectedNguoiDung}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                               HeadersVisibility="Column"
@@ -209,6 +243,9 @@
                         </DataGrid.CellStyle>
 
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="STT" 
+                                                Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" 
+                                                Width="50" IsReadOnly="True" FontWeight="SemiBold" />
                             <DataGridTextColumn Header="ID" Binding="{Binding MaNguoiDung}" Width="50" />
                             <DataGridTextColumn Header="Tên đăng nhập" Binding="{Binding TenDangNhap}" Width="*" />
                             <DataGridTextColumn Header="Họ và tên" Binding="{Binding TenNguoiDung}" Width="1.5*" />

@@ -62,7 +62,7 @@
                         <TextBlock Text="Tháng:" Style="{StaticResource FormLabel}" />
                         <ComboBox ItemsSource="{Binding DanhSachThang}" 
                                   SelectedItem="{Binding Thang}" 
-                                  Width="100" Style="{StaticResource FormInput}" Margin="0,0,24,0" />
+                                  Width="100" Style="{StaticResource FormInput}" VerticalContentAlignment="Center" Margin="0,0,24,0" />
 
                         <TextBlock Text="Năm:" Style="{StaticResource FormLabel}" />
                         <TextBox Text="{Binding Nam, UpdateSourceTrigger=PropertyChanged}" 

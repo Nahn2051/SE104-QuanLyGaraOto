@@ -97,20 +97,30 @@ namespace QuanLyGaraOto.ViewModels
 
                 foreach (var vatTu in danhSachVatTu)
                 {
-                    // Tổng nhập của vật tư này
+                    // Tổng nhập của vật tư này trong tháng
                     int tongNhap = phieuNhaps.Where(p => p.MaVTPT == vatTu.MaVTPT).Sum(p => p.SoLuong);
                     
-                    // Tổng xuất của vật tư này (giả định 1 dòng CT_PhieuSuaChua dùng 1 vật tư nếu không có cột SoLuong)
-                    // Note: Entity CT_PHIEUSUACHUA trong DB thiết kế hiện tại không có cột SoLuong (thường là 1)
-                    // Nếu sau này thêm cột SoLuong, đổi lại thành .Sum(p => p.SoLuong)
-                    int tongXuat = phieuXuats.Where(p => p.MaVTPT == vatTu.MaVTPT).Count();
+                    // Tổng xuất của vật tư này trong tháng
+                    int tongXuat = phieuXuats.Where(p => p.MaVTPT == vatTu.MaVTPT).Sum(p => p.SoLuong);
 
                     // Phát sinh = Nhập - Xuất
                     int phatSinh = tongNhap - tongXuat;
 
-                    // Giả định đơn giản cho ViewModel: Lấy số lượng tồn kho hiện tại làm Tồn Cuối
-                    // Và suy ngược ra Tồn Đầu = Tồn Cuối - Phát Sinh
-                    int tonCuoi = vatTu.SoLuongTon;
+                    // Tính Tồn Cuối của tháng được chọn bằng cách đi ngược từ Tồn kho hiện tại:
+                    // TonCuoiThang = TonHienTai - (Tổng Nhập Tương Lai) + (Tổng Xuất Tương Lai)
+                    DateTime startOfNextMonth = new DateTime(Nam, Thang, 1).AddMonths(1);
+                    
+                    int nhapTuongLai = context.ChiTietPhieuNhaps
+                        .Where(c => c.PhieuNhap != null && c.PhieuNhap.NgayNhap >= startOfNextMonth)
+                        .Where(c => c.MaVTPT == vatTu.MaVTPT)
+                        .Sum(c => (int?)c.SoLuong) ?? 0;
+
+                    int xuatTuongLai = context.ChiTietPhieuSuaChuas
+                        .Where(c => c.PhieuSuaChua != null && c.PhieuSuaChua.NgaySuaChua >= startOfNextMonth)
+                        .Where(c => c.MaVTPT == vatTu.MaVTPT)
+                        .Sum(c => (int?)c.SoLuong) ?? 0;
+
+                    int tonCuoi = vatTu.SoLuongTon - nhapTuongLai + xuatTuongLai;
                     int tonDau = tonCuoi - phatSinh;
 
                     // Đưa vào danh sách

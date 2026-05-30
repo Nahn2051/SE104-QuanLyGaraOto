@@ -18,6 +18,7 @@ namespace QuanLyGaraOto.ViewModels
         private string _email = string.Empty;
         private HieuXe? _selectedHieuXe;
         private ObservableCollection<HieuXe> _danhSachHieuXe = [];
+        private DateTime _ngayTiepNhan = DateTime.Now;
 
         // =====================================================================
         // Properties — bind lên UI
@@ -69,6 +70,12 @@ namespace QuanLyGaraOto.ViewModels
         {
             get => _selectedHieuXe;
             set => SetProperty(ref _selectedHieuXe, value);
+        }
+
+        public DateTime NgayTiepNhan
+        {
+            get => _ngayTiepNhan;
+            set => SetProperty(ref _ngayTiepNhan, value);
         }
 
         // =====================================================================
@@ -136,19 +143,23 @@ namespace QuanLyGaraOto.ViewModels
         {
             try
             {
-                using var context = new GaraDbContext();
+                if (NgayTiepNhan.Date > DateTime.Now.Date)
+                {
+                    MessageBox.Show("Ngày tiếp nhận không được lớn hơn ngày hiện tại!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-                var ngayTiepNhan = DateTime.Now;
+                using var context = new GaraDbContext();
 
                 // --- Kiểm tra số lượng xe tối đa trong ngày ---
                 var thamSoSoXe = context.ThamSos.FirstOrDefault(ts => ts.TenThamSo == "SoXeSuaChuaToiDa");
                 if (thamSoSoXe != null && int.TryParse(thamSoSoXe.GiaTri, out int maxSoXe))
                 {
-                    int soXeDaNhan = context.Xes.Count(x => x.NgayTiepNhan.HasValue && x.NgayTiepNhan.Value.Date == DateTime.Today);
+                    int soXeDaNhan = context.Xes.Count(x => x.NgayTiepNhan.HasValue && x.NgayTiepNhan.Value.Date == NgayTiepNhan.Date);
                     if (soXeDaNhan >= maxSoXe)
                     {
                         MessageBox.Show(
-                            $"Không thể tiếp nhận thêm xe!\n\nSố xe đã nhận trong ngày hôm nay ({soXeDaNhan}) đã đạt mức tối đa quy định ({maxSoXe}).",
+                            $"Không thể tiếp nhận thêm xe!\n\nSố xe đã nhận trong ngày {NgayTiepNhan:dd/MM/yyyy} ({soXeDaNhan}) đã đạt mức tối đa quy định ({maxSoXe}).",
                             "Từ chối tiếp nhận",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning
@@ -157,16 +168,60 @@ namespace QuanLyGaraOto.ViewModels
                     }
                 }
 
+                // --- CHUẨN HÓA VÀ VALIDATION DỮ LIỆU ---
+
+                // 1. Chuẩn hóa Biển Số: Tước bỏ mọi khoảng trắng, dấu chấm, dấu gạch ngang (chỉ giữ chữ và số), sau đó viết hoa.
+                // Regex @"[^a-zA-Z0-9]" sẽ tìm và thay thế (loại bỏ) mọi ký tự không phải chữ cái (a-z, A-Z) và không phải số (0-9).
+                string bienSoClean = System.Text.RegularExpressions.Regex.Replace(BienSo, @"[^a-zA-Z0-9]", "").ToUpper();
+                if (string.IsNullOrEmpty(bienSoClean))
+                {
+                    MessageBox.Show("Biển số không hợp lệ!", "Lỗi dữ liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 2. Validation Email: Bắt buộc phải chứa '@' nếu có nhập
+                if (!string.IsNullOrWhiteSpace(Email) && !Email.Contains("@"))
+                {
+                    MessageBox.Show("Email không hợp lệ (bắt buộc phải chứa ký tự @)!", "Lỗi dữ liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 3. Chuẩn hóa & Validation Số điện thoại
+                string? dienThoaiClean = null;
+                if (!string.IsNullOrWhiteSpace(DienThoai))
+                {
+                    // Tước bỏ mọi ký tự lạ, khoảng trắng, dấu gạch ngang... chỉ giữ lại số và dấu '+'
+                    // Regex @"[^\d+]" loại bỏ tất cả những gì không phải chữ số (\d) và không phải dấu cộng (+).
+                    dienThoaiClean = System.Text.RegularExpressions.Regex.Replace(DienThoai, @"[^\d+]", "");
+
+                    // Chuyển +84 hoặc 84 ở đầu thành 0
+                    if (dienThoaiClean.StartsWith("+84"))
+                    {
+                        dienThoaiClean = "0" + dienThoaiClean.Substring(3);
+                    }
+                    else if (dienThoaiClean.StartsWith("84"))
+                    {
+                        dienThoaiClean = "0" + dienThoaiClean.Substring(2);
+                    }
+
+                    // Validation: Bắt buộc có đúng 10 số và bắt đầu bằng số 0
+                    if (dienThoaiClean.Length != 10 || !dienThoaiClean.StartsWith("0"))
+                    {
+                        MessageBox.Show("Số điện thoại không hợp lệ!\n(Yêu cầu: Bắt đầu bằng 0 hoặc +84 và có đúng 10 chữ số sau khi chuẩn hóa).", "Lỗi dữ liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+
                 // --- Tạo record Xe mới ---
                 var xeMoi = new Xe
                 {
-                    BienSo = BienSo.Trim(),
+                    BienSo = bienSoClean,
                     MaHieuXe = SelectedHieuXe!.MaHieuXe,
                     TenChuXe = TenChuXe.Trim(),
                     DiaChi = string.IsNullOrWhiteSpace(DiaChi) ? null : DiaChi.Trim(),
-                    DienThoai = string.IsNullOrWhiteSpace(DienThoai) ? null : DienThoai.Trim(),
+                    DienThoai = dienThoaiClean,
                     Email = string.IsNullOrWhiteSpace(Email) ? null : Email.Trim(),
-                    NgayTiepNhan = ngayTiepNhan,
+                    NgayTiepNhan = this.NgayTiepNhan,
                     TienNo = 0
                 };
 
@@ -177,7 +232,7 @@ namespace QuanLyGaraOto.ViewModels
                 var phieuSC = new PhieuSuaChua
                 {
                     MaXe = xeMoi.MaXe,
-                    NgaySuaChua = ngayTiepNhan,
+                    NgaySuaChua = this.NgayTiepNhan,
                     TongTien = 0
                 };
 
@@ -229,6 +284,7 @@ namespace QuanLyGaraOto.ViewModels
             DiaChi = string.Empty;
             DienThoai = string.Empty;
             Email = string.Empty;
+            NgayTiepNhan = DateTime.Now;
             SelectedHieuXe = null;
         }
     }
