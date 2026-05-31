@@ -104,7 +104,17 @@
                     <DropShadowEffect Color="#000" BlurRadius="12" ShadowDepth="1" Opacity="0.05" Direction="270" />
                 </Border.Effect>
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Chi tiết xuất nhập tồn Vật tư phụ tùng" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <TextBlock Text="Chi tiết xuất nhập tồn Vật tư phụ tùng" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
+                                Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
 
                     <DataGrid ItemsSource="{Binding ChiTietBaoCao}"
                               AutoGenerateColumns="False"
@@ -139,7 +149,8 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Tên Vật Tư" Binding="{Binding TenVatTu}" Width="2*" FontWeight="SemiBold" />
                             <DataGridTextColumn Header="Tồn Đầu" Binding="{Binding TonDau, StringFormat=N0}" Width="*" />
-                            <DataGridTextColumn Header="Phát Sinh (Nhập - Xuất)" Binding="{Binding PhatSinh, StringFormat=N0}" Width="1.5*" />
+                            <DataGridTextColumn Header="Phát Sinh Nhập" Binding="{Binding PhatSinhNhap, StringFormat=N0}" Width="1*" />
+                            <DataGridTextColumn Header="Phát Sinh Xuất" Binding="{Binding PhatSinhXuat, StringFormat=N0}" Width="1*" />
                             <DataGridTextColumn Header="Tồn Cuối" Binding="{Binding TonCuoi, StringFormat=N0}" Width="*" Foreground="{StaticResource WarningBrush}" FontWeight="Bold" />
                         </DataGrid.Columns>
                     </DataGrid>

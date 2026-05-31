@@ -8,6 +8,7 @@
 - **Cơ sở dữ liệu**: SQL Server
 - **ORM**: Entity Framework Core 8.0.12
 - **Kiến trúc**: MVVM (Model - View - ViewModel)
+- **Thư viện khác**: ClosedXML (Hỗ trợ xuất báo cáo Excel)
 
 ## Cấu trúc dự án
 Dự án được chia thành các thư mục chính theo chuẩn MVVM:
@@ -57,4 +58,7 @@ Hệ thống đã được seed sẵn 2 tài khoản (Xem cấu hình trong `Gar
 - Lập phiếu thu tiền (Thanh toán, quản lý công nợ).
 - Quản lý kho (Nhập vật tư phụ tùng, tồn kho).
 - Báo cáo thống kê (Doanh số, tồn kho).
+- Tra cứu lịch sử (Xe, Phiếu sửa chữa, Phiếu nhập kho, Phiếu thu tiền).
 - Quản lý danh mục (Hiệu xe, Tiền công, Quy định hệ thống, Người dùng).
+- Tìm kiếm nhanh chóng trong các danh mục quản lý (Hiệu xe, Vật tư, Tiền công).
+- Hỗ trợ xuất dữ liệu báo cáo và danh sách ra file Excel (.xlsx) thông qua ClosedXML.

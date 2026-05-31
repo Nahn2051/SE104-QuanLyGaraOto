@@ -303,6 +303,18 @@ namespace QuanLyGaraOto.ViewModels
                         xe.TienNo += TienConLai;
                     }
 
+                    // --- 5. Lưu Phiếu Thu Tiền nếu có trả trước ---
+                    if (SoTienTra > 0)
+                    {
+                        var phieuThu = new PhieuThuTien
+                        {
+                            MaXe = SelectedXe.MaXe,
+                            NgayThuTien = NgaySuaChua, // Lưu cùng thời gian với Phiếu Sửa Chữa
+                            SoTienThu = SoTienTra
+                        };
+                        context.PhieuThuTiens.Add(phieuThu);
+                    }
+
                     context.SaveChanges();
                     transaction.Commit();
 

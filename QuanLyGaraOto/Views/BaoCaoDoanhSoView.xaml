@@ -119,7 +119,17 @@
                     <DropShadowEffect Color="#000" BlurRadius="12" ShadowDepth="1" Opacity="0.05" Direction="270" />
                 </Border.Effect>
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Chi tiết doanh số theo Hiệu xe" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <TextBlock Text="Chi tiết doanh số theo Hiệu xe" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
+                                Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
 
                     <DataGrid ItemsSource="{Binding ChiTietBaoCao}"
                               AutoGenerateColumns="False"

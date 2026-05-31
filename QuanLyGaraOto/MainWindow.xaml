@@ -42,6 +42,10 @@
             <views:TraCuuPhieuNhapKhoView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewmodels:TraCuuPhieuThuTienViewModel}">
+            <views:TraCuuPhieuThuTienView />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewmodels:BaoCaoDoanhSoViewModel}">
             <views:BaoCaoDoanhSoView />
         </DataTemplate>
@@ -230,6 +234,10 @@
                         <Button Content="📥  Lịch sử nhập kho"
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowTraCuuPhieuNhapKhoCommand}" />
+
+                        <Button Content="💵  Lịch sử thu tiền"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowTraCuuPhieuThuTienCommand}" />
 
                         <!-- ───── BÁO CÁO ───── -->
                         <TextBlock Text="BÁO CÁO" Style="{StaticResource SectionHeader}" />

@@ -66,7 +66,17 @@
                         <DropShadowEffect Color="#000" BlurRadius="10" ShadowDepth="1" Opacity="0.05" Direction="270" />
                     </Border.Effect>
                     <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="Lịch sử phiếu sửa chữa (Nháy đúp để xem chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="#757575" Margin="0,0,0,12" />
+                        <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                            <TextBlock Text="Lịch sử phiếu sửa chữa (Nháy đúp để xem chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="#757575" VerticalAlignment="Center" />
+                            <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
+                                    Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </Grid>
 
                         <DataGrid ItemsSource="{Binding DanhSachPhieu}"
                                   SelectedItem="{Binding SelectedPhieu}"
@@ -133,7 +143,24 @@
                     
                     <StackPanel Grid.Row="0">
                         <TextBlock Text="Chi Tiết Phiếu Sửa Chữa" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
-                        <TextBlock Text="{Binding SelectedPhieu.MaPhieuSuaChua, StringFormat=Mã phiếu: {0}}" FontSize="14" Foreground="#757575" Margin="0,4,0,0" />
+                        
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding SelectedPhieu.MaPhieuSuaChua, StringFormat=Mã phiếu: {0}}" FontSize="14" Foreground="#757575" />
+                                <TextBlock Text="{Binding SelectedPhieu.NgaySuaChua, StringFormat=Ngày sửa chữa: {0:dd/MM/yyyy HH:mm}}" FontSize="14" Foreground="#757575" Margin="0,4,0,0" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding SelectedPhieu.TongTien, StringFormat=Tổng tiền: {0:N0} VNĐ}" FontSize="14" Foreground="#2E7D32" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding SoTienDaTra, StringFormat=Đã trả: {0:N0} VNĐ}" FontSize="14" Foreground="#1976D2" FontWeight="SemiBold" Margin="0,4,0,0" />
+                                <TextBlock Text="{Binding SoTienNoConLai, StringFormat=Còn nợ: {0:N0} VNĐ}" FontSize="14" Foreground="#D32F2F" FontWeight="SemiBold" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Grid>
                     </StackPanel>
 
                     <DataGrid Grid.Row="2" ItemsSource="{Binding ChiTietPhieu}"
@@ -171,8 +198,24 @@
                         </DataGrid.Columns>
                     </DataGrid>
 
-                    <Button Grid.Row="4" Content="Đóng" Command="{Binding DongChiTietCommand}" 
-                            HorizontalAlignment="Right" Width="120" Height="40" Background="#9E9E9E" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" />
+                    <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="📥 Xuất Excel Chi Tiết" Command="{Binding XuatExcelChiTietCommand}" 
+                                    Padding="16,8" Margin="0,0,12,0" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6" />
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                            <Button Content="Đóng" Command="{Binding DongChiTietCommand}" 
+                                    Padding="20,8" Background="#9E9E9E" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6" />
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
+                        </StackPanel>
                 </Grid>
             </Border>
         </Grid>

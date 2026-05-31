@@ -47,6 +47,13 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _tenHieuXe, value);
         }
 
+        private string _tuKhoa = string.Empty;
+        public string TuKhoa
+        {
+            get => _tuKhoa;
+            set => SetProperty(ref _tuKhoa, value);
+        }
+
         // =====================================================================
         // Commands
         // =====================================================================
@@ -55,6 +62,8 @@ namespace QuanLyGaraOto.ViewModels
         public RelayCommand SuaCommand { get; }
         public RelayCommand<System.Collections.IList> XoaCommand { get; }
         public RelayCommand ClearFormCommand { get; }
+        public RelayCommand XuatExcelCommand { get; }
+        public RelayCommand TimKiemCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -62,24 +71,34 @@ namespace QuanLyGaraOto.ViewModels
 
         public QuanLyHieuXeViewModel()
         {
-            ThemCommand = new RelayCommand(Them, CanThemSua);
-            SuaCommand = new RelayCommand(Sua, CanSuaXoa);
-            XoaCommand = new RelayCommand<System.Collections.IList>(Xoa, CanSuaXoaList);
+            ThemCommand = new RelayCommand(ThemHieuXe, () => !string.IsNullOrWhiteSpace(TenHieuXe));
+            SuaCommand = new RelayCommand(SuaHieuXe, () => SelectedHieuXe != null && !string.IsNullOrWhiteSpace(TenHieuXe));
+            XoaCommand = new RelayCommand<System.Collections.IList>(XoaHieuXe, (items) => items != null && items.Count > 0);
             ClearFormCommand = new RelayCommand(ClearForm);
+            XuatExcelCommand = new RelayCommand(XuatExcel, () => DanhSachHieuXe.Any());
+            TimKiemCommand = new RelayCommand(LoadDanhSachHieuXe);
 
-            LoadData();
+            LoadDanhSachHieuXe();
         }
 
         // =====================================================================
         // Methods
         // =====================================================================
 
-        private void LoadData()
+        private void LoadDanhSachHieuXe()
         {
             try
             {
                 using var context = new GaraDbContext();
-                var list = context.HieuXes.ToList();
+                var query = context.HieuXes.AsQueryable();
+                
+                if (!string.IsNullOrWhiteSpace(TuKhoa))
+                {
+                    var keyword = TuKhoa.Trim().ToLower();
+                    query = query.Where(h => h.TenHieuXe.ToLower().Contains(keyword));
+                }
+                
+                var list = query.ToList();
                 DanhSachHieuXe.Clear();
                 foreach (var hx in list)
                 {
@@ -92,17 +111,48 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
-        private bool CanThemSua() => !string.IsNullOrWhiteSpace(TenHieuXe);
-        private bool CanSuaXoa() => SelectedHieuXe != null && !string.IsNullOrWhiteSpace(TenHieuXe);
-        private bool CanSuaXoaList(System.Collections.IList? items) => items != null && items.Count > 0;
-
         private void ClearForm()
         {
             SelectedHieuXe = null;
             TenHieuXe = string.Empty;
         }
 
-        private void Them()
+        private void XuatExcel()
+        {
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel("DanhSachHieuXe", wb =>
+            {
+                var ws = wb.Worksheets.Add("HieuXe");
+                ws.Cell(1, 1).Value = "DANH SÁCH HIỆU XE HIỆN CÓ";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 2).Merge();
+                ws.Range(1, 1, 1, 2).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                var headers = new[] { "Mã Hiệu Xe", "Tên Hiệu Xe" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(3, i + 1).Value = headers[i];
+                    ws.Cell(3, i + 1).Style.Font.Bold = true;
+                    ws.Cell(3, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(3, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 4;
+                foreach (var hx in DanhSachHieuXe)
+                {
+                    ws.Cell(row, 1).Value = hx.MaHieuXe;
+                    ws.Cell(row, 2).Value = hx.TenHieuXe;
+
+                    for (int c = 1; c <= 2; c++)
+                        ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    
+                    row++;
+                }
+                ws.Columns().AdjustToContents();
+            });
+        }
+
+        private void ThemHieuXe()
         {
             try
             {
@@ -125,7 +175,7 @@ namespace QuanLyGaraOto.ViewModels
                 context.SaveChanges();
 
                 MessageBox.Show("Thêm hiệu xe thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadData();
+                LoadDanhSachHieuXe();
                 ClearForm();
             }
             catch (Exception ex)
@@ -134,7 +184,7 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
-        private void Sua()
+        private void SuaHieuXe()
         {
             if (SelectedHieuXe == null) return;
 
@@ -158,7 +208,7 @@ namespace QuanLyGaraOto.ViewModels
                     context.SaveChanges();
 
                     MessageBox.Show("Cập nhật thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadData();
+                    LoadDanhSachHieuXe();
                     ClearForm();
                 }
             }
@@ -168,7 +218,7 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
-        private void Xoa(System.Collections.IList? items)
+        private void XoaHieuXe(System.Collections.IList? items)
         {
             if (items == null || items.Count == 0) return;
 
@@ -195,7 +245,7 @@ namespace QuanLyGaraOto.ViewModels
                 context.SaveChanges();
                 
                 MessageBox.Show($"Đã xóa thành công {successCount} hiệu xe!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadData();
+                LoadDanhSachHieuXe();
                 ClearForm();
             }
             catch (DbUpdateException)

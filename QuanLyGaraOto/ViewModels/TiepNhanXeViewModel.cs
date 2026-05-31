@@ -228,22 +228,10 @@ namespace QuanLyGaraOto.ViewModels
                 context.Xes.Add(xeMoi);
                 context.SaveChanges(); // Lưu để có MaXe (auto-generated)
 
-                // --- Tự động tạo Phiếu sửa chữa ---
-                var phieuSC = new PhieuSuaChua
-                {
-                    MaXe = xeMoi.MaXe,
-                    NgaySuaChua = this.NgayTiepNhan,
-                    TongTien = 0
-                };
-
-                context.PhieuSuaChuas.Add(phieuSC);
-                context.SaveChanges();
-
                 MessageBox.Show(
                     $"Tiếp nhận xe thành công!\n\n"
                     + $"• Biển số: {xeMoi.BienSo}\n"
-                    + $"• Chủ xe: {xeMoi.TenChuXe}\n"
-                    + $"• Mã phiếu sửa chữa: {phieuSC.MaPhieuSuaChua}",
+                    + $"• Chủ xe: {xeMoi.TenChuXe}",
                     "Thành công",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information

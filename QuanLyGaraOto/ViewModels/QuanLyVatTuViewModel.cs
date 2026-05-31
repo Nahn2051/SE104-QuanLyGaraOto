@@ -65,6 +65,13 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _soLuongTon, value);
         }
 
+        private string _tuKhoa = string.Empty;
+        public string TuKhoa
+        {
+            get => _tuKhoa;
+            set => SetProperty(ref _tuKhoa, value);
+        }
+
         // =====================================================================
         // Commands
         // =====================================================================
@@ -73,6 +80,8 @@ namespace QuanLyGaraOto.ViewModels
         public RelayCommand SuaCommand { get; }
         public RelayCommand XoaCommand { get; }
         public RelayCommand ClearFormCommand { get; }
+        public RelayCommand XuatExcelCommand { get; }
+        public RelayCommand TimKiemCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -84,6 +93,8 @@ namespace QuanLyGaraOto.ViewModels
             SuaCommand = new RelayCommand(Sua, CanSuaXoa);
             XoaCommand = new RelayCommand(Xoa, CanSuaXoa);
             ClearFormCommand = new RelayCommand(ResetForm);
+            XuatExcelCommand = new RelayCommand(XuatExcel, () => DanhSachVatTu.Any());
+            TimKiemCommand = new RelayCommand(LoadData);
 
             LoadData();
         }
@@ -97,11 +108,19 @@ namespace QuanLyGaraOto.ViewModels
             try
             {
                 using var context = new GaraDbContext();
-                var ds = context.VatTuPhuTungs.ToList();
-                DanhSachVatTu.Clear();
-                foreach (var item in ds)
+                var query = context.VatTuPhuTungs.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(TuKhoa))
                 {
-                    DanhSachVatTu.Add(item);
+                    var keyword = TuKhoa.Trim().ToLower();
+                    query = query.Where(v => v.TenVTPT.ToLower().Contains(keyword));
+                }
+
+                var list = query.ToList();
+                DanhSachVatTu.Clear();
+                foreach (var vt in list)
+                {
+                    DanhSachVatTu.Add(vt);
                 }
             }
             catch (Exception ex)
@@ -116,6 +135,44 @@ namespace QuanLyGaraOto.ViewModels
             TenVatTu = string.Empty;
             DonGiaNhap = 0;
             SoLuongTon = 0;
+        }
+
+        private void XuatExcel()
+        {
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel("DanhSachVatTu", wb =>
+            {
+                var ws = wb.Worksheets.Add("VatTuPhuTung");
+                ws.Cell(1, 1).Value = "DANH SÁCH VẬT TƯ PHỤ TÙNG";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 4).Merge();
+                ws.Range(1, 1, 1, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                var headers = new[] { "Mã Vật Tư", "Tên Vật Tư Phụ Tùng", "Đơn Giá", "Số Lượng Tồn" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(3, i + 1).Value = headers[i];
+                    ws.Cell(3, i + 1).Style.Font.Bold = true;
+                    ws.Cell(3, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(3, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 4;
+                foreach (var vt in DanhSachVatTu)
+                {
+                    ws.Cell(row, 1).Value = vt.MaVTPT;
+                    ws.Cell(row, 2).Value = vt.TenVTPT;
+                    ws.Cell(row, 3).Value = vt.DonGia;
+                    ws.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
+                    ws.Cell(row, 4).Value = vt.SoLuongTon;
+
+                    for (int c = 1; c <= 4; c++)
+                        ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    
+                    row++;
+                }
+                ws.Columns().AdjustToContents();
+            });
         }
 
         // --- Logic THÊM ---

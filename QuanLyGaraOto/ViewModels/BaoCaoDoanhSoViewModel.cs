@@ -43,6 +43,7 @@ namespace QuanLyGaraOto.ViewModels
         // =====================================================================
 
         public RelayCommand LapBaoCaoCommand { get; }
+        public RelayCommand XuatExcelCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -51,6 +52,7 @@ namespace QuanLyGaraOto.ViewModels
         public BaoCaoDoanhSoViewModel()
         {
             LapBaoCaoCommand = new RelayCommand(LapBaoCao);
+            XuatExcelCommand = new RelayCommand(XuatExcel, () => ChiTietBaoCao.Any());
             
             // Tự động lập báo cáo cho tháng hiện tại khi mở màn hình
             LapBaoCao();
@@ -102,11 +104,55 @@ namespace QuanLyGaraOto.ViewModels
                     row.TiLe = TongDoanhThu > 0 ? (double)(row.ThanhTien / TongDoanhThu * 100) : 0;
                     ChiTietBaoCao.Add(row);
                 }
+                XuatExcelCommand.RaiseCanExecuteChanged();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi lập báo cáo doanh số:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void XuatExcel()
+        {
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel($"BaoCaoDoanhSo_{Thang}_{Nam}", wb =>
+            {
+                var ws = wb.Worksheets.Add("BaoCaoDoanhSo");
+                ws.Cell(1, 1).Value = $"BÁO CÁO DOANH SỐ - THÁNG {Thang}/{Nam}";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 4).Merge();
+                ws.Range(1, 1, 1, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                ws.Cell(3, 1).Value = "Tổng Doanh Thu:"; ws.Cell(3, 1).Style.Font.Bold = true;
+                ws.Cell(3, 2).Value = TongDoanhThu;
+                ws.Cell(3, 2).Style.NumberFormat.Format = "#,##0";
+
+                var headers = new[] { "Hiệu Xe", "Số Lượt Sửa", "Thành Tiền", "Tỉ Lệ (%)" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(5, i + 1).Value = headers[i];
+                    ws.Cell(5, i + 1).Style.Font.Bold = true;
+                    ws.Cell(5, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(5, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 6;
+                foreach (var item in ChiTietBaoCao)
+                {
+                    ws.Cell(row, 1).Value = item.TenHieuXe;
+                    ws.Cell(row, 2).Value = item.SoLuotSua;
+                    ws.Cell(row, 3).Value = item.ThanhTien;
+                    ws.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
+                    ws.Cell(row, 4).Value = item.TiLe;
+                    ws.Cell(row, 4).Style.NumberFormat.Format = "0.00";
+
+                    for (int c = 1; c <= 4; c++)
+                        ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    
+                    row++;
+                }
+                ws.Columns().AdjustToContents();
+            });
         }
     }
 

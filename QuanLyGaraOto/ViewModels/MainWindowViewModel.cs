@@ -59,6 +59,7 @@ namespace QuanLyGaraOto.ViewModels
         public RelayCommand ShowTraCuuXeCommand { get; }
         public RelayCommand ShowTraCuuPhieuSuaChuaCommand { get; }
         public RelayCommand ShowTraCuuPhieuNhapKhoCommand { get; }
+        public RelayCommand ShowTraCuuPhieuThuTienCommand { get; }
         public RelayCommand ShowBaoCaoDoanhSoCommand { get; }
         public RelayCommand ShowBaoCaoTonKhoCommand { get; }
         public RelayCommand ShowQuanLyHieuXeCommand { get; }
@@ -82,6 +83,7 @@ namespace QuanLyGaraOto.ViewModels
             ShowTraCuuXeCommand = new RelayCommand(() => CurrentView = new TraCuuXeViewModel());
             ShowTraCuuPhieuSuaChuaCommand = new RelayCommand(() => CurrentView = new TraCuuPhieuSuaChuaViewModel());
             ShowTraCuuPhieuNhapKhoCommand = new RelayCommand(() => CurrentView = new TraCuuPhieuNhapKhoViewModel());
+            ShowTraCuuPhieuThuTienCommand = new RelayCommand(() => CurrentView = new TraCuuPhieuThuTienViewModel());
             ShowBaoCaoDoanhSoCommand = new RelayCommand(() => CurrentView = new BaoCaoDoanhSoViewModel());
             ShowBaoCaoTonKhoCommand = new RelayCommand(() => CurrentView = new BaoCaoTonKhoViewModel());
             ShowQuanLyHieuXeCommand = new RelayCommand(() => CurrentView = new QuanLyHieuXeViewModel());
