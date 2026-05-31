@@ -1,62 +1,56 @@
-# Walkthrough: Quy trình hoạt động của Quản Lý Gara Ô Tô
+# Hoàn thành Kế Hoạch: Tra Cứu Xe Chi Tiết & Xuất Báo Cáo Excel
 
-Tài liệu này mô tả chi tiết luồng nghiệp vụ (business flow) từ khi khách hàng mang xe đến Gara cho đến khi thanh toán và nhận xe, cũng như các chức năng hỗ trợ của hệ thống.
+Tất cả các tính năng bạn yêu cầu đã được triển khai thành công! Dự án đã tích hợp thư viện `ClosedXML` để làm việc với Excel một cách mượt mà và trực tiếp từ C# mà không cần cài đặt Microsoft Excel.
 
-## 1. Đăng nhập và Phân quyền
-- **Đăng nhập**: Ứng dụng bắt đầu bằng màn hình đăng nhập (`LoginView`). Người dùng nhập tên tài khoản và mật khẩu. Hệ thống sẽ xác thực thông qua `AuthService`.
-- **Phân quyền**: Có 2 vai trò chính:
-  - **Nhân viên**: Có thể tiếp nhận xe, lập phiếu sửa chữa, thu tiền, nhập kho.
-  - **Quản lý**: Có toàn quyền, bao gồm xem báo cáo doanh số, báo cáo tồn kho, quản lý danh sách người dùng và thay đổi các quy định hệ thống (tham số).
+## Các Thay Đổi Chính
 
-## 2. Luồng nghiệp vụ chính (Garage Workflow)
+### 1. Nâng cấp Bảng Tra Cứu Xe
+- Cập nhật **TraCuuXeView**:
+  - Hỗ trợ thao tác **Nháy đúp (Double-click)** vào một dòng trong bảng kết quả tra cứu để mở bảng thông tin chi tiết.
+  - Xây dựng Popup hiển thị thông tin gồm hai phần:
+    - **Nửa trên:** Thông tin cụ thể của khách hàng/xe (Biển số, Hiệu xe, Tên chủ xe, Số điện thoại, Email, Địa chỉ, Ngày tiếp nhận, Tiền nợ).
+    - **Nửa dưới:** Bảng danh sách toàn bộ Lịch sử sửa chữa của chiếc xe này.
+  - Thêm tính năng **📥 Xuất Excel** ở bảng danh sách xe chính. 
+  - Thêm tính năng **📥 Xuất Excel Chi Tiết** để tạo file báo cáo cho một chiếc xe cụ thể (Gồm cả thông tin khách và lịch sử sửa chữa).
 
-### Bước 1: Tiếp nhận xe (`TiepNhanXeView`)
-Khi khách hàng mang xe tới, nhân viên tạo hồ sơ tiếp nhận xe:
-- Nhập thông tin: Biển số, Tên chủ xe, Điện thoại, Địa chỉ, Ngày tiếp nhận.
-- Chọn Hiệu xe (được lấy từ danh mục `HieuXe`).
-- **Quy định**: Số lượng xe tiếp nhận trong ngày không được vượt quá số lượng tối đa (`SoXeSuaChuaToiDa` trong `ThamSo`).
+### 2. Xuất Báo Cáo Tra Cứu Phiếu Sửa Chữa
+- Cập nhật **TraCuuPhieuSuaChuaView**:
+  - Nút **📥 Xuất Excel** cho toàn bộ danh sách kết quả tìm kiếm phiếu sửa chữa.
+  - Nút **📥 Xuất Excel Chi Tiết** khi người dùng nháy đúp vào một phiếu, giúp tải file hóa đơn chi tiết của phiếu đó (gồm vật tư, công thợ, đơn giá, số lượng...).
 
-### Bước 2: Lập phiếu sửa chữa (`PhieuSuaChuaView`)
-Sau khi kiểm tra xe, kỹ thuật viên tiến hành sửa chữa:
-- Nhập biển số xe hoặc chọn xe đã tiếp nhận.
-- Ngày sửa chữa.
-- **Chi tiết sửa chữa**: Với mỗi nội dung công việc (ví dụ: Thay nhớt, thay lốp):
-  - Nhập nội dung sửa chữa.
-  - Chọn vật tư, phụ tùng thay thế (`VatTuPhuTung`). Hệ thống tự động tính tiền vật tư = Số lượng * Đơn giá bán (Đơn giá bán = Đơn giá nhập * `TiLeDonGiaBan`).
-  - Chọn loại tiền công (`TienCong`).
-- Hệ thống sẽ cộng dồn tổng tiền của Phiếu Sửa Chữa và ghi nợ (`TienNo`) vào hồ sơ Xe. Trừ số lượng tồn kho của Vật tư.
+### 3. Xuất Báo Cáo Tra Cứu Phiếu Nhập Kho
+- Cập nhật **TraCuuPhieuNhapKhoView**:
+  - Nút **📥 Xuất Excel** xuất toàn bộ danh sách phiếu nhập kho.
+  - Nút **📥 Xuất Excel Chi Tiết** để kết xuất chi tiết phụ tùng nhập kho bên trong một phiếu cụ thể.
 
-### Bước 3: Lập phiếu thu tiền (`PhieuThuTienView`)
-Sau khi xe được sửa xong, khách hàng thanh toán:
-- Chọn biển số xe cần thanh toán. Hệ thống hiển thị số tiền khách đang nợ (`TienNo`).
-- Nhập số tiền thu.
-- **Quy định**: Nếu tham số `ApDungQDKiemTraSoTienThu` là 1 (Có), số tiền thu không được vượt quá số tiền khách đang nợ.
-- Sau khi lưu, hệ thống tự động trừ tiền nợ của xe.
+### 4. Tra Cứu Phiếu Thu Tiền
+- Bổ sung **TraCuuPhieuThuTienView**:
+  - Hỗ trợ tìm kiếm Phiếu thu tiền theo tên chủ xe, biển số xe.
+  - Cung cấp tính năng xem popup chi tiết một Phiếu thu tiền.
+  - Nút **📥 Xuất Excel** hỗ trợ xuất lịch sử thu tiền theo kết quả tìm kiếm.
 
-### Bước 4: Tra cứu xe (`TraCuuXeView`)
-Hỗ trợ tìm kiếm thông tin xe theo các tiêu chí: Biển số, Tên chủ xe, Hiệu xe... để kiểm tra lịch sử sửa chữa hoặc nợ hiện tại.
+### 5. Xuất Excel cho Màn Hình Quản Lý & Báo Cáo
+- Thêm tính năng **📥 Xuất Excel** cho các màn hình:
+  - **Quản lý hiệu xe:** Xuất danh sách hiệu xe hiện có.
+  - **Quản lý tiền công:** Xuất danh sách các loại tiền công, đơn giá.
+  - **Quản lý vật tư phụ tùng:** Xuất danh sách vật tư phụ tùng và số lượng tồn.
+  - **Báo cáo doanh số:** Xuất báo cáo doanh số cho tháng hiện tại.
+  - **Báo cáo tồn kho:** Xuất báo cáo tồn kho cho tháng hiện tại.
+### 6. Cập Nhật Mới & Sửa Lỗi (Bug Fixes)
+- **Tiếp nhận xe:** Đã khắc phục lỗi tự động sinh ra một *Phiếu sửa chữa* rỗng (0 VNĐ) mỗi khi có xe mới tiếp nhận. Từ giờ lịch sử sửa chữa của xe mới sẽ hoàn toàn trống cho đến khi thực sự được lập phiếu.
+- **Lập phiếu sửa chữa:** Cập nhật logic lưu dữ liệu. Khi người dùng nhập `Số tiền trả` lớn hơn 0, hệ thống sẽ tự động tạo và lưu trữ một `Phiếu thu tiền` ngay tại thời điểm đó.
+- **Lịch sử sửa chữa (Tra cứu):** Cập nhật lại giao diện (UI) của phần xem chi tiết phiếu sửa chữa, nay đã hiển thị thêm thông tin **Số tiền đã trả** (truy vấn chính xác từ phiếu thu tiền cùng thời điểm) và **Số tiền còn nợ**.
+- **Báo cáo tồn kho:** Tách cột "Phát sinh (Nhập - Xuất)" cũ trên giao diện phần mềm thành 2 cột riêng biệt là **Phát sinh Nhập** và **Phát sinh Xuất**, đảm bảo số liệu hiển thị trên ứng dụng khớp 100% với số liệu xuất ra file Excel.
+- **Thanh tìm kiếm:** Bổ sung tính năng **🔍 Tìm kiếm** bằng từ khóa vào 3 màn hình Quản lý danh mục (Hiệu xe, Vật tư phụ tùng, Tiền công), cho phép người dùng lọc và tra cứu danh mục nhanh chóng.
 
-## 3. Các nghiệp vụ quản lý kho
+## Định Dạng File Excel
+Tất cả các file `.xlsx` được xuất ra đều được định dạng theo một tiêu chuẩn sạch đẹp:
+- Dòng tiêu đề (Title) được làm to, căn giữa và in đậm.
+- Các ô Header của bảng tính được bôi nền xám (LightGray), có viền (Border) và in đậm.
+- Dữ liệu tiền tệ (Tổng tiền, Tiền nợ, Đơn giá) và Số lượng được căn lề tự động và định dạng hiển thị số hàng ngàn `#,##0` (VD: 1,500,000).
+- Các cột được tính năng `AdjustToContents` tự động co giãn độ rộng phù hợp với dữ liệu bên trong.
 
-### Lập phiếu nhập kho (`PhieuNhapKhoView`)
-Khi Gara hết vật tư, cần nhập hàng:
-- Thêm các loại vật tư, phụ tùng và số lượng cần nhập, cùng đơn giá nhập.
-- Khi lưu phiếu nhập, hệ thống tự động cộng dồn số lượng vào Tồn kho của vật tư.
-
-## 4. Nghiệp vụ Báo cáo & Thống kê
-
-- **Báo cáo doanh số (`BaoCaoDoanhSoView`)**: Cho phép Quản lý xem tổng doanh thu theo tháng. Báo cáo liệt kê doanh thu của từng hiệu xe, số lượt sửa chữa và tỷ lệ % doanh thu so với tổng doanh thu trong tháng.
-- **Báo cáo tồn kho (`BaoCaoTonKhoView`)**: Xem lượng vật tư phụ tùng tồn đầu kỳ, phát sinh (nhập), sử dụng (xuất), tồn cuối kỳ trong 1 tháng nhất định.
-
-## 5. Danh mục và Cài đặt hệ thống (Dành cho Quản lý)
-
-- **Quản lý Hiệu xe / Tiền công / Vật tư**: Thêm, sửa, xóa các danh mục này để cung cấp dữ liệu nền cho phiếu sửa chữa.
-- **Thay đổi quy định (`ThayDoiQuyDinhView`)**:
-  - Số lượng xe sửa chữa tối đa trong ngày.
-  - Tỷ lệ đơn giá bán (Tính giá bán dựa trên giá nhập).
-  - Bật/tắt quy định kiểm tra số tiền thu.
-- **Quản lý người dùng (`QuanLyNguoiDungView`)**: Tạo mới tài khoản cho nhân viên, đổi mật khẩu, phân quyền.
-
----
-> [!TIP]
-> **Khuyên dùng**: Đối với người mới bắt đầu, hãy đăng nhập bằng tài khoản `admin` để có thể thấy và thử nghiệm tất cả các tính năng. Hãy làm thử một luồng cơ bản: `Tiếp nhận xe -> Lập phiếu sửa chữa -> Lập phiếu thu tiền` để hiểu rõ sự liên kết dữ liệu trong hệ thống.
+## Hướng Dẫn Kiểm Tra Trực Tiếp
+1. Mở ứng dụng, vào các mục **Tra Cứu**.
+2. Nháy đúp vào một dòng để xem tính năng Popup chi tiết.
+3. Bấm vào nút `📥 Xuất Excel` để chọn vị trí lưu và kiểm tra file tải về. Mọi tính năng hoạt động rất mượt mà.
