@@ -254,7 +254,8 @@ namespace QuanLyGaraOto.ViewModels
                     {
                         MaXe = SelectedXe.MaXe,
                         NgaySuaChua = NgaySuaChua,
-                        TongTien = TongTien
+                        TongTien = TongTien,
+                        TienThu = SoTienTra
                     };
 
                     context.PhieuSuaChuas.Add(phieu);
@@ -298,22 +299,14 @@ namespace QuanLyGaraOto.ViewModels
 
                     // --- 4. Cộng TienConLai vào TienNo của xe ---
                     var xe = context.Xes.FirstOrDefault(x => x.MaXe == SelectedXe.MaXe);
+                    decimal tienNoTruocSua = xe?.TienNo ?? 0;
                     if (xe is not null)
                     {
                         xe.TienNo += TienConLai;
                     }
 
-                    // --- 5. Lưu Phiếu Thu Tiền nếu có trả trước ---
-                    if (SoTienTra > 0)
-                    {
-                        var phieuThu = new PhieuThuTien
-                        {
-                            MaXe = SelectedXe.MaXe,
-                            NgayThuTien = NgaySuaChua, // Lưu cùng thời gian với Phiếu Sửa Chữa
-                            SoTienThu = SoTienTra
-                        };
-                        context.PhieuThuTiens.Add(phieuThu);
-                    }
+                    // --- 5. Đã bỏ logic lưu Phiếu Thu Tiền ngầm ---
+                    // Số tiền khách trả sẽ được ghi trực tiếp vào phieu.TienThu
 
                     context.SaveChanges();
                     transaction.Commit();

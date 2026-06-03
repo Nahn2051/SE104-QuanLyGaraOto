@@ -36,7 +36,42 @@ namespace QuanLyGaraOto.ViewModels
             private set => SetProperty(ref _tongDoanhThu, value);
         }
 
+        private decimal _doanhThuKhac;
+        public decimal DoanhThuKhac
+        {
+            get => _doanhThuKhac;
+            private set => SetProperty(ref _doanhThuKhac, value);
+        }
+
+        private decimal _tongDoanhThuThucTe;
+        public decimal TongDoanhThuThucTe
+        {
+            get => _tongDoanhThuThucTe;
+            private set => SetProperty(ref _tongDoanhThuThucTe, value);
+        }
+
         public ObservableCollection<ChiTietDoanhSoRow> ChiTietBaoCao { get; } = new ObservableCollection<ChiTietDoanhSoRow>();
+
+        private ChiTietDoanhSoRow? _selectedRow;
+        public ChiTietDoanhSoRow? SelectedRow
+        {
+            get => _selectedRow;
+            set => SetProperty(ref _selectedRow, value);
+        }
+
+        private bool _isPopupOpen;
+        public bool IsPopupOpen
+        {
+            get => _isPopupOpen;
+            set => SetProperty(ref _isPopupOpen, value);
+        }
+
+        private ObservableCollection<PhieuSuaChua> _danhSachPhieuChiTiet = new ObservableCollection<PhieuSuaChua>();
+        public ObservableCollection<PhieuSuaChua> DanhSachPhieuChiTiet
+        {
+            get => _danhSachPhieuChiTiet;
+            set => SetProperty(ref _danhSachPhieuChiTiet, value);
+        }
 
         // =====================================================================
         // Commands
@@ -44,6 +79,9 @@ namespace QuanLyGaraOto.ViewModels
 
         public RelayCommand LapBaoCaoCommand { get; }
         public RelayCommand XuatExcelCommand { get; }
+        public RelayCommand XuatExcelChiTietCommand { get; }
+        public RelayCommand XemChiTietCommand { get; }
+        public RelayCommand DongChiTietCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -53,6 +91,9 @@ namespace QuanLyGaraOto.ViewModels
         {
             LapBaoCaoCommand = new RelayCommand(LapBaoCao);
             XuatExcelCommand = new RelayCommand(XuatExcel, () => ChiTietBaoCao.Any());
+            XuatExcelChiTietCommand = new RelayCommand(XuatExcelChiTiet, () => DanhSachPhieuChiTiet.Any());
+            XemChiTietCommand = new RelayCommand(XemChiTiet, () => SelectedRow != null);
+            DongChiTietCommand = new RelayCommand(DongChiTiet);
             
             // Tự động lập báo cáo cho tháng hiện tại khi mở màn hình
             LapBaoCao();
@@ -85,7 +126,17 @@ namespace QuanLyGaraOto.ViewModels
                 // 2. Tính Tổng doanh thu
                 TongDoanhThu = dsPhieu.Sum(p => p.TongTien);
 
-                // 3. Group By theo Mã Hiệu Xe để tính chi tiết
+                // 3. Tính Doanh Thu Khác (Tiền phạt/dư từ phiếu thu)
+                var cacPhieuThu = context.PhieuThuTiens
+                                         .Where(p => p.NgayThuTien.Month == Thang && p.NgayThuTien.Year == Nam)
+                                         .ToList();
+                DoanhThuKhac = cacPhieuThu.Where(p => p.SoTienThu > p.TienNoTruocThu)
+                                          .Sum(p => p.SoTienThu - p.TienNoTruocThu);
+
+                // 4. Tổng Doanh Thu Thực Tế
+                TongDoanhThuThucTe = TongDoanhThu + DoanhThuKhac;
+
+                // 5. Group By theo Mã Hiệu Xe để tính chi tiết doanh thu cốt lõi
                 var thongKeHieuXe = dsPhieu
                     .Where(p => p.Xe?.HieuXe != null)
                     .GroupBy(p => p.Xe!.HieuXe)
@@ -112,6 +163,42 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
+        private void XemChiTiet()
+        {
+            if (SelectedRow == null) return;
+
+            try
+            {
+                using var context = new GaraDbContext();
+                var phieus = context.PhieuSuaChuas
+                                    .Include(p => p.Xe)
+                                    .ThenInclude(x => x.HieuXe)
+                                    .Where(p => p.NgaySuaChua.Month == Thang && 
+                                                p.NgaySuaChua.Year == Nam && 
+                                                p.Xe!.HieuXe!.TenHieuXe == SelectedRow.TenHieuXe)
+                                    .OrderByDescending(p => p.NgaySuaChua)
+                                    .ToList();
+
+                DanhSachPhieuChiTiet.Clear();
+                foreach (var p in phieus)
+                {
+                    DanhSachPhieuChiTiet.Add(p);
+                }
+
+                IsPopupOpen = true;
+                XuatExcelChiTietCommand.RaiseCanExecuteChanged();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải chi tiết:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void DongChiTiet()
+        {
+            IsPopupOpen = false;
+        }
+
         private void XuatExcel()
         {
             QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel($"BaoCaoDoanhSo_{Thang}_{Nam}", wb =>
@@ -123,20 +210,28 @@ namespace QuanLyGaraOto.ViewModels
                 ws.Range(1, 1, 1, 4).Merge();
                 ws.Range(1, 1, 1, 4).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
 
-                ws.Cell(3, 1).Value = "Tổng Doanh Thu:"; ws.Cell(3, 1).Style.Font.Bold = true;
+                ws.Cell(3, 1).Value = "Doanh Thu Sửa Chữa:"; ws.Cell(3, 1).Style.Font.Bold = true;
                 ws.Cell(3, 2).Value = TongDoanhThu;
                 ws.Cell(3, 2).Style.NumberFormat.Format = "#,##0";
+
+                ws.Cell(4, 1).Value = "Doanh Thu Khác (Tiền phạt):"; ws.Cell(4, 1).Style.Font.Bold = true;
+                ws.Cell(4, 2).Value = DoanhThuKhac;
+                ws.Cell(4, 2).Style.NumberFormat.Format = "#,##0";
+
+                ws.Cell(5, 1).Value = "Tổng Doanh Thu Thực Tế:"; ws.Cell(5, 1).Style.Font.Bold = true;
+                ws.Cell(5, 2).Value = TongDoanhThuThucTe;
+                ws.Cell(5, 2).Style.NumberFormat.Format = "#,##0";
 
                 var headers = new[] { "Hiệu Xe", "Số Lượt Sửa", "Thành Tiền", "Tỉ Lệ (%)" };
                 for (int i = 0; i < headers.Length; i++)
                 {
-                    ws.Cell(5, i + 1).Value = headers[i];
-                    ws.Cell(5, i + 1).Style.Font.Bold = true;
-                    ws.Cell(5, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
-                    ws.Cell(5, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    ws.Cell(7, i + 1).Value = headers[i];
+                    ws.Cell(7, i + 1).Style.Font.Bold = true;
+                    ws.Cell(7, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(7, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
                 }
 
-                int row = 6;
+                int row = 8;
                 foreach (var item in ChiTietBaoCao)
                 {
                     ws.Cell(row, 1).Value = item.TenHieuXe;
@@ -145,6 +240,46 @@ namespace QuanLyGaraOto.ViewModels
                     ws.Cell(row, 3).Style.NumberFormat.Format = "#,##0";
                     ws.Cell(row, 4).Value = item.TiLe;
                     ws.Cell(row, 4).Style.NumberFormat.Format = "0.00";
+
+                    for (int c = 1; c <= 4; c++)
+                        ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    
+                    row++;
+                }
+                ws.Columns().AdjustToContents();
+            });
+        }
+
+        private void XuatExcelChiTiet()
+        {
+            if (SelectedRow == null) return;
+            string fileName = $"ChiTietDoanhSo_{SelectedRow.TenHieuXe}_{Thang}_{Nam}";
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel(fileName, wb =>
+            {
+                var ws = wb.Worksheets.Add("ChiTiet");
+                ws.Cell(1, 1).Value = $"CHI TIẾT DOANH SỐ - {SelectedRow.TenHieuXe.ToUpper()} - THÁNG {Thang}/{Nam}";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 5).Merge();
+                ws.Range(1, 1, 1, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                var headers = new[] { "Mã Phiếu", "Ngày Sửa Chữa", "Biển Số", "Tổng Tiền" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(3, i + 1).Value = headers[i];
+                    ws.Cell(3, i + 1).Style.Font.Bold = true;
+                    ws.Cell(3, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(3, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 4;
+                foreach (var item in DanhSachPhieuChiTiet)
+                {
+                    ws.Cell(row, 1).Value = item.MaPhieuSuaChua;
+                    ws.Cell(row, 2).Value = item.NgaySuaChua.ToString("dd/MM/yyyy");
+                    ws.Cell(row, 3).Value = item.Xe?.BienSo;
+                    ws.Cell(row, 4).Value = item.TongTien;
+                    ws.Cell(row, 4).Style.NumberFormat.Format = "#,##0";
 
                     for (int c = 1; c <= 4; c++)
                         ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;

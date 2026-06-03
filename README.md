@@ -59,6 +59,7 @@ Hệ thống đã được seed sẵn 2 tài khoản (Xem cấu hình trong `Gar
 - Quản lý kho (Nhập vật tư phụ tùng, tồn kho).
 - Báo cáo thống kê (Doanh số, tồn kho).
 - Tra cứu lịch sử (Xe, Phiếu sửa chữa, Phiếu nhập kho, Phiếu thu tiền).
+- Hủy phiếu & Hoàn tác (Rollback): Cho phép hủy các phiếu và hệ thống sẽ tự động hoàn tác dòng tiền, công nợ, và tồn kho. Xử lý triệt để các tình huống thu tiền vượt nợ (tiền phạt).
 - Quản lý danh mục (Hiệu xe, Tiền công, Quy định hệ thống, Người dùng).
 - Tìm kiếm nhanh chóng trong các danh mục quản lý (Hiệu xe, Vật tư, Tiền công).
 - Hỗ trợ xuất dữ liệu báo cáo và danh sách ra file Excel (.xlsx) thông qua ClosedXML.

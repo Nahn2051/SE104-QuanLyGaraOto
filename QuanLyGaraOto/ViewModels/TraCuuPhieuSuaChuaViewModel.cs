@@ -16,6 +16,27 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _tuKhoa, value);
         }
 
+        private DateTime? _tuNgay;
+        public DateTime? TuNgay
+        {
+            get => _tuNgay;
+            set => SetProperty(ref _tuNgay, value);
+        }
+
+        private DateTime? _denNgay;
+        public DateTime? DenNgay
+        {
+            get => _denNgay;
+            set => SetProperty(ref _denNgay, value);
+        }
+
+        private decimal _tongTienHienThi;
+        public decimal TongTienHienThi
+        {
+            get => _tongTienHienThi;
+            set => SetProperty(ref _tongTienHienThi, value);
+        }
+
         private ObservableCollection<PhieuSuaChua> _danhSachPhieu = new ObservableCollection<PhieuSuaChua>();
         public ObservableCollection<PhieuSuaChua> DanhSachPhieu
         {
@@ -56,10 +77,12 @@ namespace QuanLyGaraOto.ViewModels
         }
 
         public RelayCommand TimKiemCommand { get; }
+        public RelayCommand BoLocNgayCommand { get; }
         public RelayCommand XemChiTietCommand { get; }
         public RelayCommand DongChiTietCommand { get; }
         public RelayCommand XuatExcelCommand { get; }
         public RelayCommand XuatExcelChiTietCommand { get; }
+        public RelayCommand HuyPhieuCommand { get; }
 
         private decimal _soTienDaTra;
         public decimal SoTienDaTra
@@ -78,11 +101,20 @@ namespace QuanLyGaraOto.ViewModels
         public TraCuuPhieuSuaChuaViewModel()
         {
             TimKiemCommand = new RelayCommand(TimKiem);
+            BoLocNgayCommand = new RelayCommand(BoLocNgay);
             XemChiTietCommand = new RelayCommand(XemChiTiet, () => SelectedPhieu != null);
             DongChiTietCommand = new RelayCommand(DongChiTiet);
             XuatExcelCommand = new RelayCommand(XuatExcel, () => DanhSachPhieu.Any());
             XuatExcelChiTietCommand = new RelayCommand(XuatExcelChiTiet, () => SelectedPhieu != null && ChiTietPhieu.Any());
+            HuyPhieuCommand = new RelayCommand(HuyPhieu, () => SelectedPhieu != null);
 
+            TimKiem();
+        }
+
+        private void BoLocNgay()
+        {
+            TuNgay = null;
+            DenNgay = null;
             TimKiem();
         }
 
@@ -109,6 +141,16 @@ namespace QuanLyGaraOto.ViewModels
                             );
                 }
 
+                if (TuNgay.HasValue)
+                {
+                    query = query.Where(p => p.NgaySuaChua.Date >= TuNgay.Value.Date);
+                }
+
+                if (DenNgay.HasValue)
+                {
+                    query = query.Where(p => p.NgaySuaChua.Date <= DenNgay.Value.Date);
+                }
+
                 var ketQua = query.OrderByDescending(p => p.NgaySuaChua).ToList();
 
                 DanhSachPhieu.Clear();
@@ -116,6 +158,9 @@ namespace QuanLyGaraOto.ViewModels
                 {
                     DanhSachPhieu.Add(p);
                 }
+
+                // Tính tổng tiền hiển thị
+                TongTienHienThi = ketQua.Sum(p => p.TongTien);
             }
             catch (Exception ex)
             {
@@ -127,29 +172,61 @@ namespace QuanLyGaraOto.ViewModels
         {
             if (SelectedPhieu != null)
             {
-                // Tính toán tiền đã trả (dựa trên phiếu thu tiền được tạo cùng lúc)
+                SoTienDaTra = SelectedPhieu.TienThu;
+                SoTienNoConLai = SelectedPhieu.TongTien - SoTienDaTra;
+
+                IsPopupOpen = true;
+            }
+        }
+
+        private void HuyPhieu()
+        {
+            if (SelectedPhieu == null) return;
+
+            var confirm = MessageBox.Show($"Bạn có chắc chắn muốn hủy phiếu sửa chữa #{SelectedPhieu.MaPhieuSuaChua} không?\n- Vật tư sẽ được cộng lại vào kho.\n- Tiền nợ sẽ được hoàn tác.", "Xác nhận hủy phiếu", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            
+            if (confirm == MessageBoxResult.Yes)
+            {
                 try
                 {
                     using var context = new GaraDbContext();
-                    var phieuThu = context.PhieuThuTiens.FirstOrDefault(pt => pt.MaXe == SelectedPhieu.MaXe && pt.NgayThuTien == SelectedPhieu.NgaySuaChua);
-                    if (phieuThu != null)
+                    var p = context.PhieuSuaChuas.Include(x => x.Xe).Include(x => x.DanhSachCTPhieuSuaChua).ThenInclude(x => x.VatTuPhuTung).FirstOrDefault(x => x.MaPhieuSuaChua == SelectedPhieu.MaPhieuSuaChua);
+                    
+                    if (p != null)
                     {
-                        SoTienDaTra = phieuThu.SoTienThu;
-                    }
-                    else
-                    {
-                        SoTienDaTra = 0;
-                    }
+                        // 1. Cộng lại tồn kho
+                        foreach(var ct in p.DanhSachCTPhieuSuaChua)
+                        {
+                            if (ct.VatTuPhuTung != null)
+                            {
+                                ct.VatTuPhuTung.SoLuongTon += ct.SoLuong;
+                            }
+                        }
 
-                    SoTienNoConLai = SelectedPhieu.TongTien - SoTienDaTra;
+                        // 2. Rollback công nợ (Trừ đi phần nợ đã cộng vào lúc sửa)
+                        if (p.Xe != null)
+                        {
+                            decimal tienNoDaCong = p.TongTien - p.TienThu;
+                            if (p.Xe.TienNo - tienNoDaCong < 0)
+                            {
+                                MessageBox.Show("Không thể hủy phiếu sửa chữa này vì sẽ làm tiền nợ của xe bị âm.\nVui lòng hủy Phiếu Thu Tiền của xe này trước khi hủy phiếu sửa chữa.", "Lỗi dữ liệu công nợ", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                            p.Xe.TienNo -= tienNoDaCong;
+                        }
+
+                        context.PhieuSuaChuas.Remove(p);
+                        context.SaveChanges();
+                        
+                        MessageBox.Show("Hủy phiếu sửa chữa thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        IsPopupOpen = false;
+                        TimKiem();
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    SoTienDaTra = 0;
-                    SoTienNoConLai = SelectedPhieu.TongTien;
+                    MessageBox.Show($"Lỗi hủy phiếu sửa chữa:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-
-                IsPopupOpen = true;
             }
         }
 

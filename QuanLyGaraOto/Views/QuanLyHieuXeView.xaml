@@ -71,7 +71,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -123,24 +123,24 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <!-- Cột 1: TextBox -->
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="0,0,0,8">
                             <TextBlock Text="Tên hiệu xe *" Style="{StaticResource FormLabel}" />
                             <TextBox Text="{Binding TenHieuXe, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" Margin="0" />
                         </StackPanel>
 
                         <!-- Cột 2: Nút bấm -->
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom">
+                        <WrapPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Bottom">
                             <Button Content="＋ Thêm Mới" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" />
                             <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
                             <Button Content="✕ Xóa" Command="{Binding XoaCommand}" CommandParameter="{Binding SelectedItems, ElementName=dgHieuXe}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
-                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
-                        </StackPanel>
+                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" />
+                        </WrapPanel>
                     </Grid>
                 </StackPanel>
             </Border>

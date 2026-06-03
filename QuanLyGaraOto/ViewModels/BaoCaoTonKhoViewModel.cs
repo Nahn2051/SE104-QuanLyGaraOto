@@ -29,6 +29,27 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _nam, value);
         }
 
+        private ChiTietTonKhoRow? _selectedRow;
+        public ChiTietTonKhoRow? SelectedRow
+        {
+            get => _selectedRow;
+            set => SetProperty(ref _selectedRow, value);
+        }
+
+        private bool _isPopupOpen;
+        public bool IsPopupOpen
+        {
+            get => _isPopupOpen;
+            set => SetProperty(ref _isPopupOpen, value);
+        }
+
+        private ObservableCollection<ChiTietGiaoDichTonKho> _danhSachGiaoDichChiTiet = new ObservableCollection<ChiTietGiaoDichTonKho>();
+        public ObservableCollection<ChiTietGiaoDichTonKho> DanhSachGiaoDichChiTiet
+        {
+            get => _danhSachGiaoDichChiTiet;
+            set => SetProperty(ref _danhSachGiaoDichChiTiet, value);
+        }
+
         public ObservableCollection<ChiTietTonKhoRow> ChiTietBaoCao { get; } = new ObservableCollection<ChiTietTonKhoRow>();
 
         // =====================================================================
@@ -37,6 +58,9 @@ namespace QuanLyGaraOto.ViewModels
 
         public RelayCommand LapBaoCaoCommand { get; }
         public RelayCommand XuatExcelCommand { get; }
+        public RelayCommand XuatExcelChiTietCommand { get; }
+        public RelayCommand XemChiTietCommand { get; }
+        public RelayCommand DongChiTietCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -46,6 +70,9 @@ namespace QuanLyGaraOto.ViewModels
         {
             LapBaoCaoCommand = new RelayCommand(LapBaoCao);
             XuatExcelCommand = new RelayCommand(XuatExcel, () => ChiTietBaoCao.Any());
+            XuatExcelChiTietCommand = new RelayCommand(XuatExcelChiTiet, () => DanhSachGiaoDichChiTiet.Any());
+            XemChiTietCommand = new RelayCommand(XemChiTiet, () => SelectedRow != null);
+            DongChiTietCommand = new RelayCommand(DongChiTiet);
             
             // Note: Không tự động chạy vì có validate tháng chốt sổ
             // Nhưng để UX tốt, ta cứ lùi lại 1 tháng so với hiện tại để làm mặc định
@@ -127,6 +154,7 @@ namespace QuanLyGaraOto.ViewModels
 
                     return new ChiTietTonKhoRow
                     {
+                        MaVTPT = vatTu.MaVTPT,
                         TenVatTu = vatTu.TenVTPT,
                         TonDau = tonDau,
                         PhatSinhNhap = tongNhap,
@@ -146,6 +174,67 @@ namespace QuanLyGaraOto.ViewModels
             {
                 MessageBox.Show($"Lỗi khi lập báo cáo tồn kho:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void XemChiTiet()
+        {
+            if (SelectedRow == null) return;
+
+            try
+            {
+                using var context = new GaraDbContext();
+                
+                // Lấy các chi tiết nhập của vật tư này trong tháng
+                var nhaps = context.ChiTietPhieuNhaps
+                                   .Include(c => c.PhieuNhap)
+                                   .Where(c => c.MaVTPT == SelectedRow.MaVTPT &&
+                                               c.PhieuNhap!.NgayNhap.Month == Thang &&
+                                               c.PhieuNhap.NgayNhap.Year == Nam)
+                                   .Select(c => new ChiTietGiaoDichTonKho
+                                   {
+                                       NgayGiaoDich = c.PhieuNhap!.NgayNhap,
+                                       LoaiGiaoDich = "Nhập Kho",
+                                       MaPhieu = c.MaPhieuNhap.ToString(),
+                                       SoLuong = c.SoLuong
+                                   })
+                                   .ToList();
+
+                // Lấy các chi tiết xuất của vật tư này trong tháng
+                var xuats = context.ChiTietPhieuSuaChuas
+                                   .Include(c => c.PhieuSuaChua)
+                                   .Where(c => c.MaVTPT == SelectedRow.MaVTPT &&
+                                               c.PhieuSuaChua!.NgaySuaChua.Month == Thang &&
+                                               c.PhieuSuaChua.NgaySuaChua.Year == Nam)
+                                   .Select(c => new ChiTietGiaoDichTonKho
+                                   {
+                                       NgayGiaoDich = c.PhieuSuaChua!.NgaySuaChua,
+                                       LoaiGiaoDich = "Xuất (Sửa chữa)",
+                                       MaPhieu = c.MaPhieuSuaChua.ToString(),
+                                       SoLuong = c.SoLuong
+                                   })
+                                   .ToList();
+
+                // Gộp chung và sắp xếp theo ngày
+                var tatCaGiaoDich = nhaps.Concat(xuats).OrderBy(g => g.NgayGiaoDich).ToList();
+
+                DanhSachGiaoDichChiTiet.Clear();
+                foreach (var g in tatCaGiaoDich)
+                {
+                    DanhSachGiaoDichChiTiet.Add(g);
+                }
+
+                IsPopupOpen = true;
+                XuatExcelChiTietCommand.RaiseCanExecuteChanged();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải chi tiết giao dịch:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void DongChiTiet()
+        {
+            IsPopupOpen = false;
         }
 
         private void XuatExcel()
@@ -185,6 +274,45 @@ namespace QuanLyGaraOto.ViewModels
                 ws.Columns().AdjustToContents();
             });
         }
+
+        private void XuatExcelChiTiet()
+        {
+            if (SelectedRow == null) return;
+            string fileName = $"ChiTietTonKho_{SelectedRow.TenVatTu}_{Thang}_{Nam}";
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel(fileName, wb =>
+            {
+                var ws = wb.Worksheets.Add("ChiTiet");
+                ws.Cell(1, 1).Value = $"CHI TIẾT GIAO DỊCH TỒN KHO - {SelectedRow.TenVatTu.ToUpper()} - THÁNG {Thang}/{Nam}";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 5).Merge();
+                ws.Range(1, 1, 1, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                var headers = new[] { "Ngày Giao Dịch", "Loại Giao Dịch", "Mã Phiếu", "Số Lượng" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(3, i + 1).Value = headers[i];
+                    ws.Cell(3, i + 1).Style.Font.Bold = true;
+                    ws.Cell(3, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(3, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 4;
+                foreach (var item in DanhSachGiaoDichChiTiet)
+                {
+                    ws.Cell(row, 1).Value = item.NgayGiaoDich.ToString("dd/MM/yyyy");
+                    ws.Cell(row, 2).Value = item.LoaiGiaoDich;
+                    ws.Cell(row, 3).Value = item.MaPhieu;
+                    ws.Cell(row, 4).Value = item.SoLuong;
+
+                    for (int c = 1; c <= 4; c++)
+                        ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    
+                    row++;
+                }
+                ws.Columns().AdjustToContents();
+            });
+        }
     }
 
     // =========================================================================
@@ -192,10 +320,19 @@ namespace QuanLyGaraOto.ViewModels
     // =========================================================================
     public class ChiTietTonKhoRow
     {
+        public int MaVTPT { get; set; }
         public string TenVatTu { get; set; } = string.Empty;
         public int TonDau { get; set; }
         public int PhatSinhNhap { get; set; }
         public int PhatSinhXuat { get; set; }
         public int TonCuoi { get; set; }
+    }
+
+    public class ChiTietGiaoDichTonKho
+    {
+        public DateTime NgayGiaoDich { get; set; }
+        public string LoaiGiaoDich { get; set; } = string.Empty;
+        public string MaPhieu { get; set; } = string.Empty;
+        public int SoLuong { get; set; }
     }
 }

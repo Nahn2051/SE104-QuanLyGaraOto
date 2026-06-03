@@ -120,8 +120,8 @@ namespace QuanLyGaraOto.ViewModels
             }
         }
 
-        private bool CanThemSua() => !string.IsNullOrWhiteSpace(TenTienCong) && DonGia > 0;
-        private bool CanSuaXoa() => SelectedTienCong != null && !string.IsNullOrWhiteSpace(TenTienCong) && DonGia > 0;
+        private bool CanThemSua() => !string.IsNullOrWhiteSpace(TenTienCong) && DonGia >= 0;
+        private bool CanSuaXoa() => SelectedTienCong != null && !string.IsNullOrWhiteSpace(TenTienCong) && DonGia >= 0;
 
         private void ClearForm()
         {

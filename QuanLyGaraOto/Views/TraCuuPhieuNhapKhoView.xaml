@@ -31,6 +31,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="16" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" CornerRadius="12" Padding="24">
@@ -41,17 +42,31 @@
                         <TextBlock Text="🔍 TRA CỨU PHIẾU NHẬP KHO" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,16" />
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBox Grid.Column="0" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
-                                     Height="44" FontSize="15" Padding="16,0" 
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,16,0">
+                                <TextBlock Text="Từ ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <DatePicker SelectedDate="{Binding TuNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,16,0">
+                                <TextBlock Text="Đến ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <DatePicker SelectedDate="{Binding DenNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                                <Button Content="✕" Command="{Binding BoLocNgayCommand}" ToolTip="Bỏ lọc ngày" 
+                                        Background="Transparent" BorderThickness="0" Foreground="#D32F2F" FontSize="16" FontWeight="Bold" 
+                                        VerticalAlignment="Center" Margin="8,0,0,0" Cursor="Hand" />
+                            </StackPanel>
+
+                            <TextBox Grid.Column="2" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
+                                     Height="44" FontSize="15" Padding="16,0" Margin="0,0,16,0"
                                      VerticalContentAlignment="Center" Background="#F8F9FA" 
                                      BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5" />
 
-                            <Button Grid.Column="2" Content="🔍 Tìm Kiếm" Command="{Binding TimKiemCommand}" 
+                            <Button Grid.Column="3" Content="🔍 Tìm Kiếm" Command="{Binding TimKiemCommand}" 
                                     Height="44" Padding="24,0" FontSize="15" FontWeight="Bold" 
                                     Foreground="White" Background="{StaticResource PrimaryBrush}" 
                                     BorderThickness="0" Cursor="Hand" />
@@ -122,6 +137,14 @@
                         </DataGrid>
                     </DockPanel>
                 </Border>
+
+                <Border Grid.Row="3" Background="#E8F5E9" CornerRadius="8" Padding="16,12" Margin="0,16,0,0" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Tổng chi tìm kiếm: " FontSize="14" Foreground="#2E7D32" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding TongTienHienThi, StringFormat=N0}" FontSize="18" FontWeight="Bold" Foreground="#1B5E20" VerticalAlignment="Center"/>
+                        <TextBlock Text=" VNĐ" FontSize="14" FontWeight="Bold" Foreground="#1B5E20" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Border>
 
@@ -179,6 +202,14 @@
                     </DataGrid>
 
                         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="🗑️ Hủy phiếu" Command="{Binding HuyPhieuCommand}" 
+                                    Padding="16,8" Margin="0,0,12,0" Background="#D32F2F" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6" />
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
                             <Button Content="📥 Xuất Excel Chi Tiết" Command="{Binding XuatExcelChiTietCommand}" 
                                     Padding="16,8" Margin="0,0,12,0" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                                 <Button.Resources>

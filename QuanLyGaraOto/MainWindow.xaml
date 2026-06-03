@@ -34,6 +34,10 @@
             <views:TraCuuXeView />
         </DataTemplate>
 
+        <DataTemplate DataType="{x:Type viewmodels:LichSuTiepNhanXeViewModel}">
+            <views:LichSuTiepNhanXeView />
+        </DataTemplate>
+
         <DataTemplate DataType="{x:Type viewmodels:TraCuuPhieuSuaChuaViewModel}">
             <views:TraCuuPhieuSuaChuaView />
         </DataTemplate>
@@ -226,6 +230,10 @@
 
                         <!-- ───── TRA CỨU ───── -->
                         <TextBlock Text="TRA CỨU LỊCH SỬ" Style="{StaticResource SectionHeader}" />
+
+                        <Button Content="🕒  Lịch sử tiếp nhận xe"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowLichSuTiepNhanXeCommand}" />
 
                         <Button Content="📄  Lịch sử sửa chữa"
                                 Style="{StaticResource MenuButton}"

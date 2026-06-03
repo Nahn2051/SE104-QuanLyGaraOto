@@ -75,7 +75,7 @@
                     <TextBlock Text="Điều chỉnh các tham số hệ thống cho Gara" FontSize="14" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,32" />
 
                     <!-- Inputs -->
-                    <TextBlock Text="1. Số xe sửa tối đa trong ngày" Style="{StaticResource FormLabel}" />
+                    <TextBlock Text="1. Số xe tiếp nhận tối đa trong ngày" Style="{StaticResource FormLabel}" />
                     <TextBox Text="{Binding SoXeToiDa, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" />
 
                     <TextBlock Text="2. Tỉ lệ đơn giá bán (Lợi nhuận)" Style="{StaticResource FormLabel}" />

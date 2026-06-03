@@ -19,6 +19,12 @@ namespace QuanLyGaraOto.Models
         [Column(TypeName = "decimal(18,0)")]
         public decimal SoTienThu { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
+        public decimal TienNoTruocThu { get; set; }
+
+        [NotMapped]
+        public decimal TienPhat => SoTienThu > TienNoTruocThu ? SoTienThu - TienNoTruocThu : 0;
+
         // Navigation properties
         [ForeignKey("MaXe")]
         public virtual Xe? Xe { get; set; }

@@ -150,6 +150,14 @@ namespace QuanLyGaraOto.ViewModels
 
                 try
                 {
+                    // Lấy tỉ lệ đơn giá bán từ Tham số
+                    decimal tiLeDonGiaBan = 1.05m; // Mặc định
+                    var thamSoTiLe = context.ThamSos.FirstOrDefault(t => t.TenThamSo == "TiLeDonGiaBan");
+                    if (thamSoTiLe != null && decimal.TryParse(thamSoTiLe.GiaTri, out decimal parsedTiLe))
+                    {
+                        tiLeDonGiaBan = parsedTiLe;
+                    }
+
                     // 1. Tạo Phiếu Nhập
                     var phieuNhap = new PhieuNhap
                     {
@@ -172,12 +180,12 @@ namespace QuanLyGaraOto.ViewModels
                         };
                         context.ChiTietPhieuNhaps.Add(chiTiet);
 
-                        // Cập nhật lại tồn kho và đơn giá nhập vào bảng VATTUPHUTUNG
+                        // Cập nhật lại tồn kho và tính lại Đơn giá bán vào bảng VATTUPHUTUNG
                         var vatTuDb = context.VatTuPhuTungs.FirstOrDefault(v => v.MaVTPT == row.SelectedVatTu.MaVTPT);
                         if (vatTuDb != null)
                         {
                             vatTuDb.SoLuongTon += row.SoLuong; // Cộng dồn số lượng
-                            vatTuDb.DonGia = row.DonGia;       // Cập nhật giá nhập mới nhất
+                            vatTuDb.DonGia = row.DonGia * tiLeDonGiaBan; // Giá bán = Giá nhập * Tỉ lệ
                         }
                     }
 

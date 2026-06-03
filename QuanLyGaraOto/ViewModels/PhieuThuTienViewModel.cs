@@ -139,17 +139,25 @@ namespace QuanLyGaraOto.ViewModels
                     return;
                 }
 
-                // 3. Lưu 1 record mới vào bảng PHIEUTHUTIEN
+                // 3. Tạo phiếu thu mới
                 var phieuThu = new PhieuThuTien
                 {
                     MaXe = xe.MaXe,
                     NgayThuTien = NgayThuTien,
-                    SoTienThu = SoTienThu
+                    SoTienThu = SoTienThu,
+                    TienNoTruocThu = xe.TienNo // Ghi nhận lịch sử nợ
                 };
                 context.PhieuThuTiens.Add(phieuThu);
 
-                // 4. Trừ số tiền thu vào TienNo của chiếc xe
-                xe.TienNo -= SoTienThu;
+                // 4. Trừ số tiền thu vào TienNo của chiếc xe (áp dụng quy định phạt nếu cần)
+                if (SoTienThu > xe.TienNo)
+                {
+                    xe.TienNo = 0; // Số tiền dôi ra được coi là tiền phạt/doanh thu thêm, công nợ bị triệt tiêu về 0
+                }
+                else
+                {
+                    xe.TienNo -= SoTienThu;
+                }
 
                 // Lưu thay đổi
                 context.SaveChanges();

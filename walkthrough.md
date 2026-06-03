@@ -43,6 +43,33 @@ Tất cả các tính năng bạn yêu cầu đã được triển khai thành c
 - **Báo cáo tồn kho:** Tách cột "Phát sinh (Nhập - Xuất)" cũ trên giao diện phần mềm thành 2 cột riêng biệt là **Phát sinh Nhập** và **Phát sinh Xuất**, đảm bảo số liệu hiển thị trên ứng dụng khớp 100% với số liệu xuất ra file Excel.
 - **Thanh tìm kiếm:** Bổ sung tính năng **🔍 Tìm kiếm** bằng từ khóa vào 3 màn hình Quản lý danh mục (Hiệu xe, Vật tư phụ tùng, Tiền công), cho phép người dùng lọc và tra cứu danh mục nhanh chóng.
 
+## 5. Cải Tiến Quy Trình và Cho Phép Hoàn Tác (Hủy)
+
+### 5.1. Tách Biệt Tiền Thu Từ Phiếu Sửa Chữa
+- Không còn tạo phiếu thu tiền ngầm khi thanh toán ngay trong lúc lập Phiếu Sửa Chữa.
+- Thêm trường `TienThu` trực tiếp vào bảng `PHIEUSUACHUA` trong Database, cho phép lưu trữ số tiền khách hàng trả ngay trên phiếu sửa chữa.
+- Cập nhật giao diện **Lịch sử (Tra cứu) Phiếu sửa chữa** hiển thị trực tiếp số tiền "Đã Trả" và "Còn Nợ".
+
+### 5.2. Hỗ Trợ Hủy Phiếu Và Rollback Dữ Liệu
+Thêm các nút "🗑️ Hủy phiếu" trong các màn hình Tra cứu / Lịch sử, với logic tự động hoàn tác:
+- **Hủy Phiếu Thu Tiền:** Số tiền thu được tự động cộng ngược trở lại vào `TienNo` của chủ xe.
+- **Hủy Phiếu Nhập Kho:** Số lượng vật tư nhập tự động bị trừ đi khỏi `SoLuongTon`. (Hệ thống có kiểm tra an toàn: nếu tồn kho hiện tại nhỏ hơn số lượng cần trừ do đã xuất xưởng, sẽ chặn không cho hủy để tránh âm kho).
+- **Hủy Phiếu Sửa Chữa:** Số lượng vật tư phụ tùng dùng cho sửa chữa được cộng trả lại vào kho. Tiền nợ đã phát sinh do phiếu này (tổng tiền - tiền đã trả) được trừ đi khỏi `TienNo` của chủ xe.
+- **Xóa Xe Tiếp Nhận:** Cho phép xóa hẳn xe và chủ xe khỏi hệ thống nếu nhập sai (Chỉ cho phép xóa khi xe chưa từng phát sinh phiếu sửa chữa hay phiếu thu tiền nào).
+### 5.3. Xử Lý Thu Tiền Vượt Nợ (Tiền Phạt)
+- **Tình huống:** Khách nợ 150.000đ nhưng bị tính thu phạt thành 200.000đ.
+- **Giải pháp thu tiền:** Nợ của khách sẽ chỉ được trừ kịch kim về `0đ`. 50.000đ thu dôi ra được ghi nhận riêng thành tiền phạt (doanh thu khác), không cộng dồn làm âm nợ (credit) để cấn trừ vào lần sửa sau.
+- **Hoàn tác (Hủy) thu tiền thông minh:** Khi hủy phiếu thu 200.000đ này, hệ thống sẽ đối chiếu và chỉ cộng lại đúng `150.000đ` nợ gốc thực tế vào hồ sơ của khách (rollback theo `TienNoTruocThu`), đảm bảo không có đồng tiền phạt nào bị cộng dồn biến thành tiền khách nợ.
+
+### 5.4. Cập Nhật UI/UX
+- **Đơn giá:** Đổi tên hiển thị từ "Đơn giá nhập" thành "Đơn giá bán" trong màn hình Quản lý vật tư để đúng logic phần mềm.
+- **Tách riêng Màn hình Tra Cứu:**
+  - `Tra cứu xe`: Chỉ cho phép tìm kiếm và xem lịch sử sửa chữa (Read-only, không có nút Xóa).
+  - `Lịch sử tiếp nhận xe` (Mới): Được cấp quyền "🗑️ Xóa Xe" nếu có sai sót trong quá trình tiếp nhận (với điều kiện xe chưa phát sinh phiếu).
+
+## 6. Verification
+Tất cả mã nguồn đều đã được kiểm tra trên các `ViewModels` để đảm bảo EF Core theo dõi và cập nhật đúng dữ liệu. Database đã được đồng bộ thông qua EF Migration. Giao diện (WPF XAML) cũng đã được căn chỉnh và bổ sung các nút với màu sắc cảnh báo đúng chuẩn thiết kế hiện đại.
+
 ## Định Dạng File Excel
 Tất cả các file `.xlsx` được xuất ra đều được định dạng theo một tiêu chuẩn sạch đẹp:
 - Dòng tiêu đề (Title) được làm to, căn giữa và in đậm.

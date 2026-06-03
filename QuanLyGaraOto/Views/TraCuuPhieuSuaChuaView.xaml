@@ -41,20 +41,34 @@
                         <TextBlock Text="🔍 TRA CỨU PHIẾU SỬA CHỮA" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,16" />
                         <Grid>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
+                    
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,16,0">
+                                <TextBlock Text="Từ ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <DatePicker SelectedDate="{Binding TuNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                            </StackPanel>
+                    
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,16,0">
+                                <TextBlock Text="Đến ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <DatePicker SelectedDate="{Binding DenNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                                <Button Content="✕" Command="{Binding BoLocNgayCommand}" ToolTip="Bỏ lọc ngày" 
+                                        Background="Transparent" BorderThickness="0" Foreground="#D32F2F" FontSize="16" FontWeight="Bold" 
+                                        VerticalAlignment="Center" Margin="8,0,0,0" Cursor="Hand" />
+                            </StackPanel>
 
-                            <TextBox Grid.Column="0" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
+                            <TextBox Grid.Column="2" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
                                      Height="44" FontSize="15" Padding="16,0" 
                                      VerticalContentAlignment="Center" Background="#F8F9FA" 
                                      BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5" />
 
-                            <Button Grid.Column="2" Content="🔍 Tìm Kiếm" Command="{Binding TimKiemCommand}" 
+                            <Button Grid.Column="3" Content="🔍 Tìm Kiếm" Command="{Binding TimKiemCommand}" 
                                     Height="44" Padding="24,0" FontSize="15" FontWeight="Bold" 
                                     Foreground="White" Background="{StaticResource PrimaryBrush}" 
-                                    BorderThickness="0" Cursor="Hand" />
+                                    BorderThickness="0" Cursor="Hand" Margin="16,0,0,0"/>
                         </Grid>
                         <TextBlock Text="Mẹo: Tìm theo mã phiếu hoặc biển số xe." 
                                    FontSize="12" Foreground="#9E9E9E" Margin="0,8,0,0" />
@@ -65,63 +79,80 @@
                     <Border.Effect>
                         <DropShadowEffect Color="#000" BlurRadius="10" ShadowDepth="1" Opacity="0.05" Direction="270" />
                     </Border.Effect>
-                    <DockPanel>
-                        <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
-                            <TextBlock Text="Lịch sử phiếu sửa chữa (Nháy đúp để xem chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="#757575" VerticalAlignment="Center" />
-                            <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
-                                    Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
-                                <Button.Resources>
-                                    <Style TargetType="Border">
-                                        <Setter Property="CornerRadius" Value="6"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <DockPanel Grid.Row="0">
+                            <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <TextBlock Text="Lịch sử phiếu sửa chữa (Nháy đúp để xem chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="#757575" VerticalAlignment="Center" />
+                                <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
+                                        Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius" Value="6"/>
+                                        </Style>
+                                    </Button.Resources>
+                                </Button>
+                            </Grid>
+
+                            <DataGrid ItemsSource="{Binding DanhSachPhieu}"
+                                      SelectedItem="{Binding SelectedPhieu}"
+                                      behaviors:DataGridBehavior.AutoNumber="True"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
+                                      BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                                      RowHeight="42" ColumnHeaderHeight="42"
+                                      Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
+                                <DataGrid.InputBindings>
+                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding XemChiTietCommand}" />
+                                </DataGrid.InputBindings>
+                                <DataGrid.ColumnHeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#F5F7FA" />
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                        <Setter Property="FontWeight" Value="SemiBold" />
+                                        <Setter Property="Padding" Value="10,0" />
                                     </Style>
-                                </Button.Resources>
-                            </Button>
-                        </Grid>
+                                </DataGrid.ColumnHeaderStyle>
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Padding" Value="10,0" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#E3F2FD" />
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.CellStyle>
 
-                        <DataGrid ItemsSource="{Binding DanhSachPhieu}"
-                                  SelectedItem="{Binding SelectedPhieu}"
-                                  behaviors:DataGridBehavior.AutoNumber="True"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                  HeadersVisibility="Column"
-                                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
-                                  BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
-                                  RowHeight="42" ColumnHeaderHeight="42"
-                                  Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
-                            <DataGrid.InputBindings>
-                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding XemChiTietCommand}" />
-                            </DataGrid.InputBindings>
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#F5F7FA" />
-                                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                    <Setter Property="Padding" Value="10,0" />
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
-                            <DataGrid.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="Padding" Value="10,0" />
-                                    <Setter Property="BorderThickness" Value="0" />
-                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="#E3F2FD" />
-                                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.CellStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
+                                    <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding MaPhieuSuaChua}" Width="100" FontWeight="Bold" />
+                                    <DataGridTextColumn Header="Biển số xe" Binding="{Binding Xe.BienSo}" Width="150" FontWeight="Bold" />
+                                    <DataGridTextColumn Header="Ngày Sửa Chữa" Binding="{Binding NgaySuaChua, StringFormat=dd/MM/yyyy HH:mm}" Width="*" />
+                                    <DataGridTextColumn Header="Tổng Tiền" Binding="{Binding TongTien, StringFormat=N0}" Width="120" Foreground="#2E7D32" FontWeight="Bold" />
+                                    <DataGridTextColumn Header="Đã Trả" Binding="{Binding TienThu, StringFormat=N0}" Width="120" Foreground="#1976D2" FontWeight="Bold" />
+                                    <DataGridTextColumn Header="Còn Nợ" Binding="{Binding TienNo, StringFormat=N0}" Width="120" Foreground="#D32F2F" FontWeight="Bold" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
 
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
-                                <DataGridTextColumn Header="Mã Phiếu" Binding="{Binding MaPhieuSuaChua}" Width="100" FontWeight="Bold" />
-                                <DataGridTextColumn Header="Biển số xe" Binding="{Binding Xe.BienSo}" Width="150" FontWeight="Bold" />
-                                <DataGridTextColumn Header="Ngày Sửa Chữa" Binding="{Binding NgaySuaChua, StringFormat=dd/MM/yyyy HH:mm}" Width="*" />
-                                <DataGridTextColumn Header="Tổng Tiền" Binding="{Binding TongTien, StringFormat=N0}" Width="150" Foreground="#2E7D32" FontWeight="Bold" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
+                        <Border Grid.Row="1" Background="#E8F5E9" CornerRadius="8" Padding="16,12" Margin="0,16,0,0" HorizontalAlignment="Right">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Tổng tiền tìm kiếm: " FontSize="14" Foreground="#2E7D32" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding TongTienHienThi, StringFormat=N0}" FontSize="18" FontWeight="Bold" Foreground="#1B5E20" VerticalAlignment="Center"/>
+                                <TextBlock Text=" VNĐ" FontSize="14" FontWeight="Bold" Foreground="#1B5E20" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>
@@ -199,6 +230,14 @@
                     </DataGrid>
 
                     <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="🗑️ Hủy phiếu" Command="{Binding HuyPhieuCommand}" 
+                                    Padding="16,8" Margin="0,0,12,0" Background="#D32F2F" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6" />
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
                             <Button Content="📥 Xuất Excel Chi Tiết" Command="{Binding XuatExcelChiTietCommand}" 
                                     Padding="16,8" Margin="0,0,12,0" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
                                 <Button.Resources>

@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:behaviors="clr-namespace:QuanLyGaraOto.Behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
 
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <!-- Colors & Brushes -->
         <Color x:Key="PrimaryColor">#1565C0</Color>
         <Color x:Key="WarningColor">#F57C00</Color>
@@ -42,8 +44,9 @@
         </Style>
     </UserControl.Resources>
 
-    <Border Background="{StaticResource BackgroundBrush}" Padding="20">
-        <Grid>
+    <Grid>
+        <Border Background="{StaticResource BackgroundBrush}" Padding="20">
+            <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="16" />
@@ -105,7 +108,7 @@
                 </Border.Effect>
                 <DockPanel>
                     <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
-                        <TextBlock Text="Chi tiết xuất nhập tồn Vật tư phụ tùng" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="Chi tiết xuất nhập tồn Vật tư phụ tùng (Nháy đúp để xem sổ kho chi tiết)" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" />
                         <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" HorizontalAlignment="Right"
                                 Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
                             <Button.Resources>
@@ -117,6 +120,8 @@
                     </Grid>
 
                     <DataGrid ItemsSource="{Binding ChiTietBaoCao}"
+                              SelectedItem="{Binding SelectedRow}"
+                              behaviors:DataGridBehavior.AutoNumber="True"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                               HeadersVisibility="Column"
@@ -124,6 +129,9 @@
                               BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                               RowHeight="44" ColumnHeaderHeight="44"
                               Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
+                        <DataGrid.InputBindings>
+                            <MouseBinding Gesture="LeftDoubleClick" Command="{Binding XemChiTietCommand}" />
+                        </DataGrid.InputBindings>
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#F5F7FA" />
@@ -147,6 +155,7 @@
                         </DataGrid.CellStyle>
 
                         <DataGrid.Columns>
+                            <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="60" />
                             <DataGridTextColumn Header="Tên Vật Tư" Binding="{Binding TenVatTu}" Width="2*" FontWeight="SemiBold" />
                             <DataGridTextColumn Header="Tồn Đầu" Binding="{Binding TonDau, StringFormat=N0}" Width="*" />
                             <DataGridTextColumn Header="Phát Sinh Nhập" Binding="{Binding PhatSinhNhap, StringFormat=N0}" Width="1*" />
@@ -157,5 +166,88 @@
                 </DockPanel>
             </Border>
         </Grid>
-    </Border>
+        </Border>
+
+    <!-- DIALOG XEM CHI TIẾT (Drill-down Sổ Kho) -->
+    <Grid Visibility="{Binding IsPopupOpen, Converter={StaticResource BoolToVis}}" Background="#80000000" Panel.ZIndex="100">
+        <Border Background="White" CornerRadius="16" Width="800" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" BlurRadius="30" Opacity="0.3" ShadowDepth="5" />
+            </Border.Effect>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="16" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="Sổ Kho Vật Tư Chi Tiết" FontSize="20" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <TextBlock Text="Vật tư: " FontSize="14" Foreground="#757575" />
+                        <TextBlock Text="{Binding SelectedRow.TenVatTu}" FontSize="14" FontWeight="Bold" Foreground="#424242" />
+                        <TextBlock Text=" | Tháng: " FontSize="14" Foreground="#757575" />
+                        <TextBlock Text="{Binding Thang}" FontSize="14" FontWeight="Bold" Foreground="#424242" />
+                        <TextBlock Text="/" FontSize="14" FontWeight="Bold" Foreground="#424242" />
+                        <TextBlock Text="{Binding Nam}" FontSize="14" FontWeight="Bold" Foreground="#424242" />
+                    </StackPanel>
+                </StackPanel>
+
+                <DataGrid Grid.Row="2" ItemsSource="{Binding DanhSachGiaoDichChiTiet}"
+                          behaviors:DataGridBehavior.AutoNumber="True"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#ECEFF1"
+                          BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                          RowHeight="42" ColumnHeaderHeight="42"
+                          Background="White" RowBackground="White" AlternatingRowBackground="#FAFBFC">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F5F7FA" />
+                            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                            <Setter Property="Padding" Value="10,0" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="10,0" />
+                            <Setter Property="BorderThickness" Value="0" />
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
+                        <DataGridTextColumn Header="Ngày Giao Dịch" Binding="{Binding NgayGiaoDich, StringFormat=dd/MM/yyyy HH:mm}" Width="*" />
+                        <DataGridTextColumn Header="Loại Giao Dịch" Binding="{Binding LoaiGiaoDich}" Width="150" FontWeight="SemiBold" />
+                        <DataGridTextColumn Header="Mã Phiếu Gốc" Binding="{Binding MaPhieu}" Width="120" />
+                        <DataGridTextColumn Header="Số Lượng" Binding="{Binding SoLuong, StringFormat=N0}" Width="100" FontWeight="Bold" Foreground="{StaticResource WarningBrush}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelChiTietCommand}" 
+                            Padding="20,8" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand" Margin="0,0,12,0">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button Content="Đóng" Command="{Binding DongChiTietCommand}" 
+                            Padding="20,8" Background="#9E9E9E" Foreground="White" FontWeight="Bold" BorderThickness="0" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6" />
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+    </Grid>
 </UserControl>

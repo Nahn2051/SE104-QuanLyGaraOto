@@ -16,6 +16,27 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _tuKhoa, value);
         }
 
+        private DateTime? _tuNgay;
+        public DateTime? TuNgay
+        {
+            get => _tuNgay;
+            set => SetProperty(ref _tuNgay, value);
+        }
+
+        private DateTime? _denNgay;
+        public DateTime? DenNgay
+        {
+            get => _denNgay;
+            set => SetProperty(ref _denNgay, value);
+        }
+
+        private decimal _tongTienHienThi;
+        public decimal TongTienHienThi
+        {
+            get => _tongTienHienThi;
+            set => SetProperty(ref _tongTienHienThi, value);
+        }
+
         private ObservableCollection<PhieuNhap> _danhSachPhieu = new ObservableCollection<PhieuNhap>();
         public ObservableCollection<PhieuNhap> DanhSachPhieu
         {
@@ -56,19 +77,30 @@ namespace QuanLyGaraOto.ViewModels
         }
 
         public RelayCommand TimKiemCommand { get; }
+        public RelayCommand BoLocNgayCommand { get; }
         public RelayCommand XemChiTietCommand { get; }
         public RelayCommand DongChiTietCommand { get; }
         public RelayCommand XuatExcelCommand { get; }
         public RelayCommand XuatExcelChiTietCommand { get; }
+        public RelayCommand HuyPhieuCommand { get; }
 
         public TraCuuPhieuNhapKhoViewModel()
         {
             TimKiemCommand = new RelayCommand(TimKiem);
+            BoLocNgayCommand = new RelayCommand(BoLocNgay);
             XemChiTietCommand = new RelayCommand(XemChiTiet, () => SelectedPhieu != null);
             DongChiTietCommand = new RelayCommand(DongChiTiet);
             XuatExcelCommand = new RelayCommand(XuatExcel, () => DanhSachPhieu.Any());
             XuatExcelChiTietCommand = new RelayCommand(XuatExcelChiTiet, () => SelectedPhieu != null && ChiTietPhieu.Any());
+            HuyPhieuCommand = new RelayCommand(HuyPhieu, () => SelectedPhieu != null);
 
+            TimKiem();
+        }
+
+        private void BoLocNgay()
+        {
+            TuNgay = null;
+            DenNgay = null;
             TimKiem();
         }
 
@@ -91,6 +123,16 @@ namespace QuanLyGaraOto.ViewModels
                             );
                 }
 
+                if (TuNgay.HasValue)
+                {
+                    query = query.Where(p => p.NgayNhap.Date >= TuNgay.Value.Date);
+                }
+
+                if (DenNgay.HasValue)
+                {
+                    query = query.Where(p => p.NgayNhap.Date <= DenNgay.Value.Date);
+                }
+
                 var ketQua = query.OrderByDescending(p => p.NgayNhap).ToList();
 
                 DanhSachPhieu.Clear();
@@ -98,6 +140,8 @@ namespace QuanLyGaraOto.ViewModels
                 {
                     DanhSachPhieu.Add(p);
                 }
+
+                TongTienHienThi = ketQua.Sum(p => p.TongTien);
             }
             catch (Exception ex)
             {
@@ -110,6 +154,55 @@ namespace QuanLyGaraOto.ViewModels
             if (SelectedPhieu != null)
             {
                 IsPopupOpen = true;
+            }
+        }
+
+        private void HuyPhieu()
+        {
+            if (SelectedPhieu == null) return;
+
+            var confirm = MessageBox.Show($"Bạn có chắc chắn muốn hủy phiếu nhập kho #{SelectedPhieu.MaPhieuNhap} không?\nSố lượng vật tư trong phiếu sẽ bị trừ khỏi kho.", "Xác nhận hủy phiếu", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            
+            if (confirm == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    using var context = new GaraDbContext();
+                    var p = context.PhieuNhaps.Include(x => x.DanhSachCTPhieuNhap).ThenInclude(x => x.VatTuPhuTung).FirstOrDefault(x => x.MaPhieuNhap == SelectedPhieu.MaPhieuNhap);
+                    
+                    if (p != null)
+                    {
+                        // 1. Kiểm tra an toàn: Tồn kho có đủ để trừ hay không?
+                        foreach(var ct in p.DanhSachCTPhieuNhap)
+                        {
+                            if (ct.VatTuPhuTung != null && ct.VatTuPhuTung.SoLuongTon < ct.SoLuong)
+                            {
+                                MessageBox.Show($"Không thể hủy phiếu nhập này vì vật tư '{ct.VatTuPhuTung.TenVTPT}' đã được xuất sử dụng.\n(Tồn kho hiện tại: {ct.VatTuPhuTung.SoLuongTon}, Cần trừ: {ct.SoLuong})", "Lỗi an toàn dữ liệu", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                        }
+
+                        // 2. Trừ tồn kho
+                        foreach(var ct in p.DanhSachCTPhieuNhap)
+                        {
+                            if (ct.VatTuPhuTung != null)
+                            {
+                                ct.VatTuPhuTung.SoLuongTon -= ct.SoLuong;
+                            }
+                        }
+
+                        context.PhieuNhaps.Remove(p);
+                        context.SaveChanges();
+                        
+                        MessageBox.Show("Hủy phiếu nhập kho thành công!", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        IsPopupOpen = false;
+                        TimKiem();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Lỗi hủy phiếu nhập kho:\n{ex.Message}", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

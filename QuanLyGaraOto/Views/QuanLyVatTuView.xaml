@@ -86,7 +86,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Margin" Value="0,0,0,12" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -140,15 +140,15 @@
                 <DockPanel>
                     <!-- Header DataGrid -->
                     <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         
-                        <TextBlock Grid.Column="0" Text="📦 Danh Sách Vật Tư Phụ Tùng" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Text="📦 Danh Sách Vật Tư Phụ Tùng" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" />
                         
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,16,0">
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
                             <TextBox Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" Width="250" Height="32" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#E0E0E0" BorderThickness="1" Background="#F9FAFB">
                                 <TextBox.Resources>
                                     <Style TargetType="Border">
@@ -166,16 +166,15 @@
                                     </Style>
                                 </Button.Resources>
                             </Button>
+                            <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" Margin="8,0,0,0"
+                                    Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
                         </StackPanel>
-
-                        <Button Grid.Column="2" Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" 
-                                Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
                     </Grid>
                     
                     <DataGrid ItemsSource="{Binding DanhSachVatTu}"
@@ -217,7 +216,7 @@
                                                 Width="50" />
                             <DataGridTextColumn Header="Mã" Binding="{Binding MaVTPT}" Width="60" IsReadOnly="True" />
                             <DataGridTextColumn Header="Tên vật tư" Binding="{Binding TenVTPT}" Width="*" IsReadOnly="True" />
-                            <DataGridTextColumn Header="Đơn giá nhập" Binding="{Binding DonGia, StringFormat=N0}" Width="120" IsReadOnly="True" />
+                            <DataGridTextColumn Header="Đơn giá bán" Binding="{Binding DonGia, StringFormat=N0}" Width="120" IsReadOnly="True" />
                             <DataGridTextColumn Header="Tồn kho" Binding="{Binding SoLuongTon}" Width="80" IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
@@ -235,20 +234,20 @@
                     <TextBlock Text="Tên vật tư *" Style="{StaticResource FormLabel}" />
                     <TextBox Text="{Binding TenVatTu, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" />
                     
-                    <TextBlock Text="Đơn giá nhập (VNĐ)" Style="{StaticResource FormLabel}" />
-                    <TextBox Text="{Binding DonGiaNhap, StringFormat=N0}" Style="{StaticResource FormTextBox}" IsReadOnly="True" ToolTip="Đơn giá sẽ được tự động cập nhật khi Lập phiếu nhập kho" />
+                    <TextBlock Text="Đơn giá bán (VNĐ)" Style="{StaticResource FormLabel}" />
+                    <TextBox Text="{Binding DonGiaNhap, StringFormat=N0}" Style="{StaticResource FormTextBox}" IsReadOnly="True" ToolTip="Đơn giá bán sẽ được tự động tính (Nhập * Tỉ lệ) khi Lập phiếu nhập kho" />
                     
                     <TextBlock Text="Số lượng tồn kho" Style="{StaticResource FormLabel}" />
                     <TextBox Text="{Binding SoLuongTon}" Style="{StaticResource FormTextBox}" IsReadOnly="True" ToolTip="Số lượng tồn kho sẽ được tự động cập nhật khi Lập phiếu nhập kho / sửa chữa" />
                     
                     <Border Height="1" Background="{StaticResource BorderBrush}" Margin="0,8,0,24" />
 
-                    <WrapPanel HorizontalAlignment="Center">
-                        <Button Content="＋ Thêm" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" />
-                        <Button Content="✎ Sửa" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
-                        <Button Content="✕ Xóa" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
-                        <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0"/>
-                    </WrapPanel>
+                    <!-- Buttons -->
+                    <Button Content="＋ Thêm Mới" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" />
+                    <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
+                    <Button Content="✕ Xóa Vật Tư" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
+                    
+                    <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" />
                 </StackPanel>
             </Border>
         </Grid>

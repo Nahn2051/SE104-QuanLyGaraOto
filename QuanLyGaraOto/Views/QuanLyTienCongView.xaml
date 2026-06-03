@@ -122,15 +122,15 @@
                 </Border.Effect>
                 <DockPanel>
                     <Grid DockPanel.Dock="Top" Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
                         
-                        <TextBlock Grid.Column="0" Text="Danh sách Tiền công" FontSize="16" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Text="Danh sách Tiền công" FontSize="16" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" VerticalAlignment="Center" />
                         
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,16,0">
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
                             <TextBox Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" Width="200" Height="32" Padding="8,4" VerticalContentAlignment="Center" BorderBrush="#E0E0E0" BorderThickness="1" Background="#F9FAFB">
                                 <TextBox.Resources>
                                     <Style TargetType="Border">
@@ -148,16 +148,15 @@
                                     </Style>
                                 </Button.Resources>
                             </Button>
+                            <Button Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" Margin="8,0,0,0"
+                                    Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="6"/>
+                                    </Style>
+                                </Button.Resources>
+                            </Button>
                         </StackPanel>
-
-                        <Button Grid.Column="2" Content="📥 Xuất Excel" Command="{Binding XuatExcelCommand}" 
-                                Padding="12,6" Background="#2E7D32" Foreground="White" FontWeight="Bold" BorderThickness="0">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius" Value="6"/>
-                                </Style>
-                            </Button.Resources>
-                        </Button>
                     </Grid>
 
                     <DataGrid ItemsSource="{Binding DanhSachTienCong}"
@@ -227,7 +226,7 @@
                     <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" />
                     <Button Content="✕ Xóa Tiền Công" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
                     
-                    <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
+                    <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" />
                 </StackPanel>
             </Border>
         </Grid>

@@ -107,7 +107,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Margin" Value="0,0,8,8" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -195,8 +195,8 @@
                         <StackPanel Grid.Column="4" VerticalAlignment="Bottom" Margin="0,0,0,16">
                             <Button Content="＋ Thêm Mới" Command="{Binding ThemCommand}" Background="{StaticResource SuccessBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
                             <Button Content="✎ Cập Nhật" Command="{Binding SuaCommand}" Background="{StaticResource WarningBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
-                            <Button Content="✕ Xóa User" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" Margin="0,0,0,12" />
-                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" Margin="0" />
+                            <Button Content="✕ Xóa User" Command="{Binding XoaCommand}" Background="{StaticResource DangerBrush}" Style="{StaticResource ActionButton}" />
+                            <Button Content="Bỏ chọn (Clear)" Command="{Binding ClearFormCommand}" Background="#90A4AE" Style="{StaticResource ActionButton}" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>
