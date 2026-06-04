@@ -53,11 +53,14 @@ Hệ thống đã được seed sẵn 2 tài khoản (Xem cấu hình trong `Gar
 - **Nhân viên**: Tên đăng nhập: `nhanvien` | Mật khẩu: `nv123`
 
 ## Các chức năng chính
-- Tiếp nhận xe (Quản lý thông tin xe, chủ xe, hiệu xe).
-- Lập phiếu sửa chữa (Quản lý vật tư phụ tùng, tiền công sửa chữa).
-- Lập phiếu thu tiền (Thanh toán, quản lý công nợ).
-- Quản lý kho (Nhập vật tư phụ tùng, tồn kho).
-- Báo cáo thống kê (Doanh số, tồn kho).
+- Cấu hình linh hoạt: Thay đổi quy định về tỉ lệ giá bán, số xe sửa tối đa, quy định thu tiền nợ.
+- Tiếp nhận xe: Quản lý chi tiết thông tin khách hàng, số điện thoại, email, địa chỉ, hiệu xe.
+- Lập phiếu sửa chữa: Tự động tính toán vật tư, tiền công, cho phép thanh toán và tự động cập nhật công nợ.
+- Lập phiếu thu tiền: Thanh toán nợ linh hoạt, tự động trích lập tiền phạt nếu khách trả vượt nợ.
+- Quản lý kho: Nhập kho tự động, cảnh báo âm kho.
+- Báo cáo thống kê: Xuất Excel Báo cáo doanh số và Báo cáo tồn kho hằng tháng.
+- Tra cứu chuyên sâu: Tìm kiếm đa chiều kết hợp lọc theo ngày (`Từ ngày` - `Đến ngày`) với ràng buộc logic chặt chẽ.
+- Tính năng Hủy/Hoàn tác (Rollback): Cho phép hủy Phiếu sửa chữa, Phiếu thu tiền, Phiếu nhập kho, tự động đối soát và trả lại chính xác số lượng tồn kho cũng như công nợ khách hàng một cách thông minh.
 - Tra cứu lịch sử (Xe, Phiếu sửa chữa, Phiếu nhập kho, Phiếu thu tiền).
 - Hủy phiếu & Hoàn tác (Rollback): Cho phép hủy các phiếu và hệ thống sẽ tự động hoàn tác dòng tiền, công nợ, và tồn kho. Xử lý triệt để các tình huống thu tiền vượt nợ (tiền phạt).
 - Quản lý danh mục (Hiệu xe, Tiền công, Quy định hệ thống, Người dùng).

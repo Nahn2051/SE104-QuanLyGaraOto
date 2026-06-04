@@ -79,7 +79,7 @@
                                 <TextBlock Text="Năm:" Style="{StaticResource FormLabel}" />
                                 <TextBox Text="{Binding Nam, UpdateSourceTrigger=PropertyChanged}" 
                                          Width="100" Style="{StaticResource FormInput}" 
-                                         VerticalContentAlignment="Center" />
+                                         VerticalContentAlignment="Center" PreviewTextInput="NumberValidationTextBox" />
                             </StackPanel>
 
                             <Button Content="📋 Lập Báo Cáo" Command="{Binding LapBaoCaoCommand}" 

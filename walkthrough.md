@@ -61,8 +61,10 @@ Thêm các nút "🗑️ Hủy phiếu" trong các màn hình Tra cứu / Lịch
 - **Giải pháp thu tiền:** Nợ của khách sẽ chỉ được trừ kịch kim về `0đ`. 50.000đ thu dôi ra được ghi nhận riêng thành tiền phạt (doanh thu khác), không cộng dồn làm âm nợ (credit) để cấn trừ vào lần sửa sau.
 - **Hoàn tác (Hủy) thu tiền thông minh:** Khi hủy phiếu thu 200.000đ này, hệ thống sẽ đối chiếu và chỉ cộng lại đúng `150.000đ` nợ gốc thực tế vào hồ sơ của khách (rollback theo `TienNoTruocThu`), đảm bảo không có đồng tiền phạt nào bị cộng dồn biến thành tiền khách nợ.
 
-### 5.4. Cập Nhật UI/UX
+### 5.4. Cập Nhật UI/UX & Tính Logic
 - **Đơn giá:** Đổi tên hiển thị từ "Đơn giá nhập" thành "Đơn giá bán" trong màn hình Quản lý vật tư để đúng logic phần mềm.
+- **Ràng buộc Thời gian (Validation):** Bổ sung bộ lọc `Từ ngày` - `Đến ngày` ở toàn bộ các màn hình Lịch sử/Tra cứu (Lịch sử tiếp nhận xe, Tra cứu phiếu sửa chữa, Tra cứu phiếu thu, Tra cứu phiếu nhập). Kèm theo đó là logic tự động bắt lỗi hiển thị `MessageBox` cảnh báo chặn tìm kiếm nếu người dùng nhập `Từ ngày > Đến ngày`.
+- **Lịch sử tiếp nhận xe:** Nâng cấp bảng `DataGrid` để hiển thị toàn bộ chi tiết liên lạc của khách hàng từ form Tiếp nhận xe (Bao gồm: *Biển số, Hiệu xe, Tên chủ xe, Điện thoại, Địa chỉ, Email, Ngày tiếp nhận, Tiền nợ*), thay vì chỉ hiển thị các cột cơ bản giống bên màn hình Tra cứu xe.
 - **Tách riêng Màn hình Tra Cứu:**
   - `Tra cứu xe`: Chỉ cho phép tìm kiếm và xem lịch sử sửa chữa (Read-only, không có nút Xóa).
   - `Lịch sử tiếp nhận xe` (Mới): Được cấp quyền "🗑️ Xóa Xe" nếu có sai sót trong quá trình tiếp nhận (với điều kiện xe chưa phát sinh phiếu).

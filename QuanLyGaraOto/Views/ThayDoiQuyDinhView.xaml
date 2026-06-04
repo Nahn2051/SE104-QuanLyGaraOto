@@ -76,10 +76,10 @@
 
                     <!-- Inputs -->
                     <TextBlock Text="1. Số xe tiếp nhận tối đa trong ngày" Style="{StaticResource FormLabel}" />
-                    <TextBox Text="{Binding SoXeToiDa, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" />
+                    <TextBox Text="{Binding SoXeToiDa, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" PreviewTextInput="NumberValidationTextBox" />
 
                     <TextBlock Text="2. Tỉ lệ đơn giá bán (Lợi nhuận)" Style="{StaticResource FormLabel}" />
-                    <TextBox Text="{Binding TiLeDonGiaBan, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" ToolTip="Ví dụ: 1.05 = Cộng thêm 5% tiền lời so với giá nhập" />
+                    <TextBox Text="{Binding TiLeDonGiaBan, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource FormTextBox}" ToolTip="Ví dụ: 1.05 = Cộng thêm 5% tiền lời so với giá nhập" PreviewTextInput="DecimalValidationTextBox" />
 
                     <!-- CheckBox -->
                     <CheckBox IsChecked="{Binding KiemTraTienThu}" Margin="0,8,0,32" VerticalContentAlignment="Center">

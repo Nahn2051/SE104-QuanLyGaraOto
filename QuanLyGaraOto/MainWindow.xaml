@@ -193,16 +193,8 @@
 
                         <Border Height="1" Background="#37474F" Margin="16,8" />
 
-                        <!-- ───── NGHIỆP VỤ ───── -->
-                        <TextBlock Text="NGHIỆP VỤ" Style="{StaticResource SectionHeader}" />
-
-                        <Button Content="🏷️  Quản lý hiệu xe"
-                                Style="{StaticResource MenuButton}"
-                                Command="{Binding ShowQuanLyHieuXeCommand}" />
-
-                        <Button Content="🛠️  Quản lý tiền công"
-                                Style="{StaticResource MenuButton}"
-                                Command="{Binding ShowQuanLyTienCongCommand}" />
+                        <!-- ───── LẬP PHIẾU ───── -->
+                        <TextBlock Text="NGHIỆP VỤ &amp; LẬP PHIẾU" Style="{StaticResource SectionHeader}" />
 
                         <Button Content="📋  Tiếp nhận xe"
                                 Style="{StaticResource MenuButton}"
@@ -216,20 +208,31 @@
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowPhieuThuTienCommand}" />
 
-                        <Button Content="📦  Quản lý vật tư phụ tùng"
-                                Style="{StaticResource MenuButton}"
-                                Command="{Binding ShowQuanLyVatTuCommand}" />
-
                         <Button Content="📥  Nhập kho vật tư"
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowPhieuNhapKhoCommand}" />
 
+                        <!-- ───── QUẢN LÝ DANH MỤC ───── -->
+                        <TextBlock Text="QUẢN LÝ DANH MỤC" Style="{StaticResource SectionHeader}" />
+
+                        <Button Content="🏷️  Quản lý hiệu xe"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowQuanLyHieuXeCommand}" />
+
+                        <Button Content="🛠️  Quản lý tiền công"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowQuanLyTienCongCommand}" />
+
+                        <Button Content="📦  Quản lý vật tư phụ tùng"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowQuanLyVatTuCommand}" />
+
+                        <!-- ───── TRA CỨU & LỊCH SỬ ───── -->
+                        <TextBlock Text="TRA CỨU &amp; LỊCH SỬ" Style="{StaticResource SectionHeader}" />
+
                         <Button Content="🔍  Tra cứu xe"
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowTraCuuXeCommand}" />
-
-                        <!-- ───── TRA CỨU ───── -->
-                        <TextBlock Text="TRA CỨU LỊCH SỬ" Style="{StaticResource SectionHeader}" />
 
                         <Button Content="🕒  Lịch sử tiếp nhận xe"
                                 Style="{StaticResource MenuButton}"
@@ -239,13 +242,13 @@
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowTraCuuPhieuSuaChuaCommand}" />
 
-                        <Button Content="📥  Lịch sử nhập kho"
-                                Style="{StaticResource MenuButton}"
-                                Command="{Binding ShowTraCuuPhieuNhapKhoCommand}" />
-
                         <Button Content="💵  Lịch sử thu tiền"
                                 Style="{StaticResource MenuButton}"
                                 Command="{Binding ShowTraCuuPhieuThuTienCommand}" />
+
+                        <Button Content="📥  Lịch sử nhập kho"
+                                Style="{StaticResource MenuButton}"
+                                Command="{Binding ShowTraCuuPhieuNhapKhoCommand}" />
 
                         <!-- ───── BÁO CÁO ───── -->
                         <TextBlock Text="BÁO CÁO" Style="{StaticResource SectionHeader}" />

@@ -20,6 +20,28 @@ namespace QuanLyGaraOto.ViewModels
             set => SetProperty(ref _tuKhoa, value);
         }
 
+        private DateTime? _tuNgay;
+        public DateTime? TuNgay
+        {
+            get => _tuNgay;
+            set
+            {
+                SetProperty(ref _tuNgay, value);
+                TimKiem();
+            }
+        }
+
+        private DateTime? _denNgay;
+        public DateTime? DenNgay
+        {
+            get => _denNgay;
+            set
+            {
+                SetProperty(ref _denNgay, value);
+                TimKiem();
+            }
+        }
+
         private ObservableCollection<Xe> _danhSachXe = new ObservableCollection<Xe>();
         public ObservableCollection<Xe> DanhSachXe
         {
@@ -66,6 +88,7 @@ namespace QuanLyGaraOto.ViewModels
         public RelayCommand XemChiTietCommand { get; }
         public RelayCommand DongChiTietCommand { get; }
         public RelayCommand HuyXeCommand { get; }
+        public RelayCommand BoLocNgayCommand { get; }
 
         // =====================================================================
         // Constructor
@@ -79,6 +102,7 @@ namespace QuanLyGaraOto.ViewModels
             XemChiTietCommand = new RelayCommand(XemChiTiet, () => SelectedXe != null);
             DongChiTietCommand = new RelayCommand(DongChiTiet);
             HuyXeCommand = new RelayCommand(HuyXe, () => SelectedXe != null);
+            BoLocNgayCommand = new RelayCommand(BoLocNgay);
 
             // Tải danh sách toàn bộ xe khi mới mở màn hình
             TimKiem();
@@ -99,15 +123,36 @@ namespace QuanLyGaraOto.ViewModels
                                    .Include(x => x.HieuXe)
                                    .AsQueryable();
 
+                // Kiểm tra ràng buộc ngày
+                if (TuNgay.HasValue && DenNgay.HasValue && TuNgay.Value.Date > DenNgay.Value.Date)
+                {
+                    MessageBox.Show("Từ ngày không được lớn hơn Đến ngày!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // Nếu có từ khóa thì thêm điều kiện lọc (không phân biệt chữ hoa/thường)
                 if (!string.IsNullOrWhiteSpace(TuKhoa))
                 {
                     var keyword = TuKhoa.Trim().ToLower();
+                    // Loại bỏ các ký tự đặc biệt khỏi từ khóa để tìm kiếm biển số cho chính xác (ví dụ khách gõ 50F-123.45 thì sẽ thành 50f12345)
+                    var keywordBienSo = keyword.Replace("-", "").Replace(".", "").Replace(" ", "");
+
                     query = query.Where(x => 
-                                x.BienSo.ToLower().Contains(keyword) ||
+                                x.BienSo.ToLower().Contains(keywordBienSo) ||
                                 x.TenChuXe.ToLower().Contains(keyword) ||
                                 (x.HieuXe != null && x.HieuXe.TenHieuXe.ToLower().Contains(keyword))
                             );
+                }
+
+                // Lọc theo ngày tiếp nhận
+                if (TuNgay.HasValue)
+                {
+                    query = query.Where(x => x.NgayTiepNhan != null && x.NgayTiepNhan.Value.Date >= TuNgay.Value.Date);
+                }
+                
+                if (DenNgay.HasValue)
+                {
+                    query = query.Where(x => x.NgayTiepNhan != null && x.NgayTiepNhan.Value.Date <= DenNgay.Value.Date);
                 }
 
                 // Thực thi truy vấn
@@ -172,6 +217,15 @@ namespace QuanLyGaraOto.ViewModels
         private void DongChiTiet()
         {
             IsPopupOpen = false;
+        }
+
+        private void BoLocNgay()
+        {
+            _tuNgay = null;
+            OnPropertyChanged(nameof(TuNgay));
+            _denNgay = null;
+            OnPropertyChanged(nameof(DenNgay));
+            TimKiem();
         }
 
         private void LoadLichSuSuaChua(int maXe)

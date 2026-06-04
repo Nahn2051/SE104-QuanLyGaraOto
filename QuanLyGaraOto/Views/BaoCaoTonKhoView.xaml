@@ -70,7 +70,7 @@
                         <TextBlock Text="Năm:" Style="{StaticResource FormLabel}" />
                         <TextBox Text="{Binding Nam, UpdateSourceTrigger=PropertyChanged}" 
                                  Width="100" Style="{StaticResource FormInput}" 
-                                 VerticalContentAlignment="Center" Margin="0,0,24,0" />
+                                 VerticalContentAlignment="Center" Margin="0,0,24,0" PreviewTextInput="NumberValidationTextBox" />
 
                         <Button Content="📋 Lập Báo Cáo Tồn Kho" Command="{Binding LapBaoCaoCommand}" 
                                 Height="40" Padding="24,0" FontSize="14" FontWeight="Bold" 

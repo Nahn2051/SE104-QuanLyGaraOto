@@ -101,8 +101,11 @@ namespace QuanLyGaraOto.ViewModels
                 if (!string.IsNullOrWhiteSpace(TuKhoa))
                 {
                     var keyword = TuKhoa.Trim().ToLower();
+                    // Loại bỏ các ký tự đặc biệt khỏi từ khóa để tìm kiếm biển số cho chính xác (ví dụ khách gõ 50F-123.45 thì sẽ thành 50f12345)
+                    var keywordBienSo = keyword.Replace("-", "").Replace(".", "").Replace(" ", "");
+
                     query = query.Where(x => 
-                                x.BienSo.ToLower().Contains(keyword) ||
+                                x.BienSo.ToLower().Contains(keywordBienSo) ||
                                 x.TenChuXe.ToLower().Contains(keyword) ||
                                 (x.HieuXe != null && x.HieuXe.TenHieuXe.ToLower().Contains(keyword))
                             );

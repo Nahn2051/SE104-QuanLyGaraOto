@@ -221,7 +221,7 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
                             <DataGridTextColumn Header="Nội Dung" Binding="{Binding NoiDungSuaChua}" Width="2*" />
-                            <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVatTu}" Width="1.5*" />
+                            <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVTPT}" Width="1.5*" />
                             <DataGridTextColumn Header="SL" Binding="{Binding SoLuong}" Width="60" />
                             <DataGridTextColumn Header="Đơn Giá" Binding="{Binding DonGia, StringFormat=N0}" Width="1*" />
                             <DataGridTextColumn Header="Tiền Công" Binding="{Binding TienCong.TenTienCong}" Width="1.5*" />

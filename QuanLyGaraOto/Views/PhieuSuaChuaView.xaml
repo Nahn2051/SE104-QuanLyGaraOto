@@ -398,9 +398,9 @@
                                                 Binding="{Binding SoLuong,
                                                           UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNumberConverter}}" />
 
-                            <!-- Đơn giá (read-only, tự hiện khi chọn vật tư) -->
-                            <DataGridTextColumn Header="Đơn giá" Width="110" IsReadOnly="True"
-                                                Binding="{Binding DonGia, StringFormat=N0}" />
+                            <!-- Đơn giá (có thể sửa thành 0 nếu bảo hành/khuyến mãi) -->
+                            <DataGridTextColumn Header="Đơn giá" Width="110"
+                                                Binding="{Binding DonGia, UpdateSourceTrigger=PropertyChanged, StringFormat=N0, Converter={StaticResource StringToNumberConverter}}" />
 
                             <!-- Thành tiền (read-only, tự tính) -->
                             <DataGridTextColumn Header="Thành tiền" Width="120" IsReadOnly="True"

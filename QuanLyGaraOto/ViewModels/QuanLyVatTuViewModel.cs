@@ -188,6 +188,14 @@ namespace QuanLyGaraOto.ViewModels
             {
                 using var context = new GaraDbContext();
                 
+                // Kiểm tra trùng tên vật tư
+                var exists = context.VatTuPhuTungs.Any(x => x.TenVTPT.ToLower() == TenVatTu.Trim().ToLower());
+                if (exists)
+                {
+                    MessageBox.Show("Tên vật tư này đã tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 var vMoi = new VatTuPhuTung
                 {
                     TenVTPT = TenVatTu.Trim(),
@@ -226,6 +234,16 @@ namespace QuanLyGaraOto.ViewModels
             try
             {
                 using var context = new GaraDbContext();
+
+                // Kiểm tra trùng tên vật tư (bỏ qua chính nó)
+                var exists = context.VatTuPhuTungs.Any(x => x.MaVTPT != SelectedVatTu!.MaVTPT 
+                                                   && x.TenVTPT.ToLower() == TenVatTu.Trim().ToLower());
+                if (exists)
+                {
+                    MessageBox.Show("Tên vật tư này đã tồn tại trong hệ thống!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 var v = context.VatTuPhuTungs.FirstOrDefault(x => x.MaVTPT == SelectedVatTu!.MaVTPT);
                 if (v != null)
                 {

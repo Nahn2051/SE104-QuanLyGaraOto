@@ -100,12 +100,20 @@ namespace QuanLyGaraOto.ViewModels
                                    .Include(p => p.Xe)
                                    .AsQueryable();
 
+                if (TuNgay.HasValue && DenNgay.HasValue && TuNgay.Value.Date > DenNgay.Value.Date)
+                {
+                    MessageBox.Show("Từ ngày không được lớn hơn Đến ngày!", "Lỗi ngày tháng", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (!string.IsNullOrWhiteSpace(TuKhoa))
                 {
                     var keyword = TuKhoa.Trim().ToLower();
+                    var keywordBienSo = keyword.Replace("-", "").Replace(".", "").Replace(" ", "");
+
                     query = query.Where(p => 
                                 p.MaPhieuThuTien.ToString() == keyword ||
-                                (p.Xe != null && p.Xe.BienSo.ToLower().Contains(keyword))
+                                (p.Xe != null && p.Xe.BienSo.ToLower().Contains(keywordBienSo))
                             );
                 }
 

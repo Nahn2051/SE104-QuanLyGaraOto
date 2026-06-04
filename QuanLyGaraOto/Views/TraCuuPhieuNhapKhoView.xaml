@@ -194,7 +194,7 @@
                         </DataGrid.CellStyle>
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="STT" Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=Header}" Width="50" />
-                            <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVatTu}" Width="2*" />
+                            <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVTPT}" Width="2*" />
                             <DataGridTextColumn Header="Số Lượng" Binding="{Binding SoLuong}" Width="1*" />
                             <DataGridTextColumn Header="Đơn Giá Nhập" Binding="{Binding DonGia, StringFormat=N0}" Width="1.5*" />
                             <DataGridTextColumn Header="Thành Tiền" Binding="{Binding ThanhTien, StringFormat=N0}" Width="1.5*" FontWeight="Bold" Foreground="#2E7D32"/>

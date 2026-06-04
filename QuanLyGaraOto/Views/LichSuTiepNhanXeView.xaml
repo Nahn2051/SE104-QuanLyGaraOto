@@ -13,6 +13,7 @@
         <Color x:Key="SurfaceColor">#FFFFFF</Color>
         <Color x:Key="BackgroundColor">#F5F7FA</Color>
         <Color x:Key="TextPrimaryColor">#212121</Color>
+        <Color x:Key="TextSecondaryColor">#757575</Color>
         <Color x:Key="BorderColor">#E0E0E0</Color>
 
         <!-- Converters -->
@@ -24,6 +25,7 @@
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}" />
         <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
         <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
     </UserControl.Resources>
 
@@ -45,21 +47,35 @@
                     
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="16" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,16,0">
+                            <TextBlock Text="Từ ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <DatePicker SelectedDate="{Binding TuNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                        </StackPanel>
+                
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,16,0">
+                            <TextBlock Text="Đến ngày:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource TextSecondaryBrush}"/>
+                            <DatePicker SelectedDate="{Binding DenNgay, UpdateSourceTrigger=PropertyChanged}" Width="130" Height="40" Padding="8,0" VerticalContentAlignment="Center" />
+                            <Button Content="✕" Command="{Binding BoLocNgayCommand}" ToolTip="Bỏ lọc ngày" 
+                                    Background="Transparent" BorderThickness="0" Foreground="#D32F2F" FontSize="16" FontWeight="Bold" 
+                                    VerticalAlignment="Center" Margin="8,0,0,0" Cursor="Hand" />
+                        </StackPanel>
 
                         <!-- Ô nhập tìm kiếm, cập nhật ngay khi gõ bằng UpdateSourceTrigger=PropertyChanged -->
-                        <TextBox Grid.Column="0" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
+                        <TextBox Grid.Column="2" Text="{Binding TuKhoa, UpdateSourceTrigger=PropertyChanged}" 
                                  Height="44" Padding="12,0" FontSize="15" 
                                  VerticalContentAlignment="Center"
                                  BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
                                  ToolTip="Nhập Biển số, Tên chủ xe hoặc Hiệu xe" />
                         
-                        <Button Grid.Column="2" Content="Tìm kiếm" Command="{Binding TimKiemCommand}" 
+                        <Button Grid.Column="3" Content="Tìm kiếm" Command="{Binding TimKiemCommand}" 
                                 Height="44" Padding="24,0" FontSize="15" FontWeight="Bold" 
-                                Foreground="White" Background="{StaticResource PrimaryBrush}" BorderThickness="0" Cursor="Hand">
+                                Foreground="White" Background="{StaticResource PrimaryBrush}" BorderThickness="0" Cursor="Hand" Margin="16,0,0,0">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8">
@@ -150,15 +166,23 @@
                             <!-- Cột Biển số dùng BienSoConverter -->
                             <DataGridTextColumn Header="Biển số" 
                                                 Binding="{Binding BienSo, Converter={StaticResource BienSoConverter}}" 
-                                                Width="*" FontWeight="Bold" />
+                                                Width="0.8*" FontWeight="Bold" />
                             
                             <!-- Bind theo Navigation Property HieuXe.TenHieuXe -->
-                            <DataGridTextColumn Header="Hiệu xe" Binding="{Binding HieuXe.TenHieuXe}" Width="*" />
+                            <DataGridTextColumn Header="Hiệu xe" Binding="{Binding HieuXe.TenHieuXe}" Width="0.8*" />
                             
-                            <DataGridTextColumn Header="Tên chủ xe" Binding="{Binding TenChuXe}" Width="1.5*" />
+                            <DataGridTextColumn Header="Tên chủ xe" Binding="{Binding TenChuXe}" Width="1.2*" />
+                            
+                            <DataGridTextColumn Header="Điện thoại" Binding="{Binding DienThoai}" Width="0.8*" />
+                            
+                            <DataGridTextColumn Header="Địa chỉ" Binding="{Binding DiaChi}" Width="1.5*" />
+                            
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.2*" />
+                            
+                            <DataGridTextColumn Header="Ngày tiếp nhận" Binding="{Binding NgayTiepNhan, StringFormat=dd/MM/yyyy}" Width="1*" />
                             
                             <!-- Cột Tiền nợ được Format tiền tệ đẹp -->
-                            <DataGridTextColumn Header="Tiền nợ" Binding="{Binding TienNo, StringFormat=N0}" Width="*" />
+                            <DataGridTextColumn Header="Tiền nợ" Binding="{Binding TienNo, StringFormat=N0}" Width="0.8*" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
