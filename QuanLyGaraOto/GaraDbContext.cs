@@ -380,16 +380,22 @@ namespace QuanLyGaraOto.Models
 
             var tienCongs = hanhDongs
                 .SelectMany(h => boPhans, (h, b) => $"{h} {b}")
-                .Take(99) // Lấy 99 dòng
+                .Take(98) // Lấy 98 dòng
                 .Select((ten, index) => new TienCong
                 {
-                    MaTienCong = index + 2, // Bắt đầu từ ID = 2
+                    MaTienCong = index + 3, // Bắt đầu từ ID = 3
                     TenTienCong = ten,
                     // Random từ 50,000 đến 500,000 (làm tròn hàng ngàn)
                     DonGia = random.Next(50, 500) * 1000m
                 }).ToList();
 
-            // Chèn "Không tính công" (0 VNĐ) vào đầu danh sách (ID = 1)
+            // Chèn "Không tính công" và "Bảo hành" vào đầu danh sách
+            tienCongs.Insert(0, new TienCong
+            {
+                MaTienCong = 2,
+                TenTienCong = "Bảo hành",
+                DonGia = 0
+            });
             tienCongs.Insert(0, new TienCong
             {
                 MaTienCong = 1,

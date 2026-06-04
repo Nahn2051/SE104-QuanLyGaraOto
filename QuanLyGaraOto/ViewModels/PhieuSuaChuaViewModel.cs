@@ -419,6 +419,20 @@ namespace QuanLyGaraOto.ViewModels
             {
                 if (SetProperty(ref _selectedTienCong, value))
                 {
+                    if (value != null)
+                    {
+                        // Nếu chọn tiền công là "Bảo hành"
+                        if (value.TenTienCong.Contains("Bảo hành", StringComparison.OrdinalIgnoreCase))
+                        {
+                            DonGia = 0; // Tự động đưa giá vật tư về 0
+                        }
+                        // Nếu đổi sang loại khác (kể cả "Không tính công"), khôi phục lại giá gốc nếu đang là 0
+                        else if (SelectedVatTu != null && DonGia == 0)
+                        {
+                            DonGia = SelectedVatTu.DonGia * _tiLeDonGiaBan;
+                        }
+                    }
+                    
                     TinhThanhTien();
                 }
             }
