@@ -61,8 +61,19 @@ namespace QuanLyGaraOto.ViewModels
             get => _chuoiGiamGia;
             set
             {
-                if (SetProperty(ref _chuoiGiamGia, value))
+                // Loại bỏ mọi ký tự không phải là số hoặc dấu %
+                string cleanValue = System.Text.RegularExpressions.Regex.Replace(value ?? "", @"[^0-9%]", "");
+
+                if (SetProperty(ref _chuoiGiamGia, cleanValue))
+                {
                     TinhTongTien();
+                }
+
+                // Nếu người dùng nhập ký tự chữ/đặc biệt, ép UI cập nhật lại giá trị đã clean
+                if (value != cleanValue)
+                {
+                    OnPropertyChanged(nameof(ChuoiGiamGia));
+                }
             }
         }
 
@@ -221,6 +232,16 @@ namespace QuanLyGaraOto.ViewModels
                     }
                 }
             }
+            // Kiểm tra ràng buộc cho giảm giá: không được âm và không được vượt quá Tổng tiền
+            if (giamGia < 0)
+            {
+                giamGia = 0;
+            }
+            else if (giamGia > TongTien)
+            {
+                giamGia = TongTien;
+            }
+
             TienGiamGia = giamGia;
             OnPropertyChanged(nameof(TienConLai));
         }
