@@ -14,6 +14,8 @@ namespace QuanLyGaraOto.ViewModels
         private Xe? _selectedXe;
         private DateTime _ngaySuaChua = DateTime.Now;
         private decimal _tongTien;
+        private string _chuoiGiamGia = string.Empty;
+        private decimal _tienGiamGia;
         private decimal _soTienTra;
         private ChiTietPhieuSuaChuaRow? _selectedChiTiet;
         private decimal _tiLeDonGiaBan = 1.0m; // Lưu trữ tỷ lệ lấy từ DB
@@ -54,6 +56,26 @@ namespace QuanLyGaraOto.ViewModels
             private set => SetProperty(ref _tongTien, value);
         }
 
+        public string ChuoiGiamGia
+        {
+            get => _chuoiGiamGia;
+            set
+            {
+                if (SetProperty(ref _chuoiGiamGia, value))
+                    TinhTongTien();
+            }
+        }
+
+        public decimal TienGiamGia
+        {
+            get => _tienGiamGia;
+            private set
+            {
+                if (SetProperty(ref _tienGiamGia, value))
+                    OnPropertyChanged(nameof(TienConLai));
+            }
+        }
+
         public decimal SoTienTra
         {
             get => _soTienTra;
@@ -65,9 +87,9 @@ namespace QuanLyGaraOto.ViewModels
         }
 
         /// <summary>
-        /// Tiền Còn Lại = Tổng Tiền - Số Tiền Trả. Tự tính toán.
+        /// Tiền Còn Lại = Tổng Tiền - Giảm Giá - Số Tiền Trả. Tự tính toán.
         /// </summary>
-        public decimal TienConLai => TongTien - SoTienTra;
+        public decimal TienConLai => TongTien - TienGiamGia - SoTienTra;
 
         /// <summary>
         /// Dòng chi tiết đang được chọn trên DataGrid.
@@ -179,6 +201,27 @@ namespace QuanLyGaraOto.ViewModels
         private void TinhTongTien()
         {
             TongTien = ChiTietSuaChuas.Sum(ct => ct.ThanhTien);
+
+            decimal giamGia = 0;
+            if (!string.IsNullOrWhiteSpace(ChuoiGiamGia))
+            {
+                string cleanStr = ChuoiGiamGia.Trim();
+                if (cleanStr.EndsWith("%"))
+                {
+                    if (decimal.TryParse(cleanStr.TrimEnd('%'), out decimal percent))
+                    {
+                        giamGia = TongTien * (percent / 100m);
+                    }
+                }
+                else
+                {
+                    if (decimal.TryParse(cleanStr, out decimal amount))
+                    {
+                        giamGia = amount;
+                    }
+                }
+            }
+            TienGiamGia = giamGia;
             OnPropertyChanged(nameof(TienConLai));
         }
 
@@ -235,9 +278,9 @@ namespace QuanLyGaraOto.ViewModels
                 }
             }
 
-            if (SoTienTra > TongTien)
+            if (SoTienTra > (TongTien - TienGiamGia))
             {
-                MessageBox.Show("Số tiền trả không được vượt quá Tổng tiền của phiếu sửa chữa!",
+                MessageBox.Show("Số tiền trả không được vượt quá số tiền phải thanh toán!",
                     "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
@@ -255,6 +298,7 @@ namespace QuanLyGaraOto.ViewModels
                         MaXe = SelectedXe.MaXe,
                         NgaySuaChua = NgaySuaChua,
                         TongTien = TongTien,
+                        TienGiamGia = TienGiamGia,
                         TienThu = SoTienTra
                     };
 
@@ -353,6 +397,7 @@ namespace QuanLyGaraOto.ViewModels
         {
             SelectedXe = null;
             NgaySuaChua = DateTime.Now;
+            ChuoiGiamGia = string.Empty;
             SoTienTra = 0;
             ChiTietSuaChuas.Clear();
             TinhTongTien();

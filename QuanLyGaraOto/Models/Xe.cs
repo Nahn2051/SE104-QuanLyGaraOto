@@ -21,8 +21,9 @@ namespace QuanLyGaraOto.Models
         [MaxLength(100)]
         public string TenChuXe { get; set; } = string.Empty;
 
+        [Required]
         [MaxLength(15)]
-        public string? DienThoai { get; set; }
+        public string DienThoai { get; set; } = string.Empty;
 
         [MaxLength(200)]
         public string? DiaChi { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLyGaraOto.Models;
 
@@ -11,9 +12,11 @@ using QuanLyGaraOto.Models;
 namespace QuanLyGaraOto.Migrations
 {
     [DbContext(typeof(GaraDbContext))]
-    partial class GaraDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260605105716_AddGiamGiaPhieuSuaChua")]
+    partial class AddGiamGiaPhieuSuaChua
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2429,7 +2432,6 @@ namespace QuanLyGaraOto.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("DienThoai")
-                        .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 

@@ -115,6 +115,14 @@ namespace QuanLyGaraOto.ViewModels
             {
                 using var context = new GaraDbContext();
 
+                // Kiểm tra số xe tiếp nhận trong ngày
+                int soXeHomNay = context.Xes.Count(x => x.NgayTiepNhan.HasValue && x.NgayTiepNhan.Value.Date == DateTime.Today.Date);
+                if (SoXeToiDa < soXeHomNay)
+                {
+                    MessageBox.Show($"Số xe tiếp nhận trong ngày ({soXeHomNay} xe) đã lớn hơn số muốn đổi ({SoXeToiDa} xe).\nVui lòng thực hiện lại vào ngày mai hoặc nhập số lớn hơn!", "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // 1. Update Số xe tối đa
                 var qd1 = context.ThamSos.FirstOrDefault(ts => ts.TenThamSo == "SoXeSuaChuaToiDa");
                 if (qd1 != null)

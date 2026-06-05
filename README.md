@@ -53,9 +53,13 @@ Hệ thống đã được seed sẵn 2 tài khoản (Xem cấu hình trong `Gar
 - **Nhân viên**: Tên đăng nhập: `nhanvien` | Mật khẩu: `nv123`
 
 ## Các chức năng chính
-- Cấu hình linh hoạt: Thay đổi quy định về tỉ lệ giá bán, số xe sửa tối đa, quy định thu tiền nợ.
-- Tiếp nhận xe: Quản lý chi tiết thông tin khách hàng, số điện thoại, email, địa chỉ, hiệu xe.
-- Lập phiếu sửa chữa: Tự động tính toán vật tư, tiền công, cho phép thanh toán và tự động cập nhật công nợ.
+- Cấu hình linh hoạt: Thay đổi quy định về tỉ lệ giá bán, số xe sửa tối đa, quy định thu tiền nợ. Có kiểm tra validation theo thời gian thực (VD: Không được giảm số xe tối đa xuống dưới số xe đã nhận trong ngày).
+- Tiếp nhận xe: Quản lý chi tiết thông tin khách hàng, số điện thoại (bắt buộc nhập), email, địa chỉ, hiệu xe.
+- Lập phiếu sửa chữa:
+  - Tự động tính toán vật tư, tiền công.
+  - Hỗ trợ tính năng **Giảm giá** linh hoạt (nhập số tiền trực tiếp hoặc phần trăm %).
+  - Thông minh với loại tiền công **Bảo hành**: tự động đưa giá vật tư về 0đ.
+  - Cho phép thanh toán ngay và tự động cập nhật công nợ.
 - Lập phiếu thu tiền: Thanh toán nợ linh hoạt, tự động trích lập tiền phạt nếu khách trả vượt nợ.
 - Quản lý kho: Nhập kho tự động, cảnh báo âm kho.
 - Báo cáo thống kê: Xuất Excel Báo cáo doanh số và Báo cáo tồn kho hằng tháng.

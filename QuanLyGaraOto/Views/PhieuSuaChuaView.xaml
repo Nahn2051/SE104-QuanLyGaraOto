@@ -446,8 +446,7 @@
 
                     <!-- Tổng tiền (bên trái) -->
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <!-- Tổng tiền -->
-                        <StackPanel Margin="0,0,32,0">
+                        <StackPanel Margin="0,0,24,0">
                             <TextBlock Text="Tổng tiền" FontSize="11.5"
                                        Foreground="{StaticResource TextSecondaryBrush}" />
                             <TextBlock Style="{StaticResource MoneyLabel}"
@@ -457,10 +456,28 @@
 
                         <!-- Separator -->
                         <Border Width="1" Height="36" Background="#E0E0E0"
-                                Margin="0,0,32,0" />
+                                Margin="0,0,24,0" />
 
-                        <!-- Số tiền trả -->
-                        <StackPanel Margin="0,0,32,0">
+                        <!-- Giảm giá -->
+                        <StackPanel Margin="0,0,24,0" VerticalAlignment="Center">
+                            <TextBlock Text="Giảm giá (VNĐ / %)" FontSize="11.5"
+                                       Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Width="80" Height="28" Padding="6,2" FontSize="13" 
+                                         BorderBrush="{StaticResource BorderBrush}" BorderThickness="1.5"
+                                         Text="{Binding ChuoiGiamGia, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding TienGiamGia, StringFormat={} ({0:N0}đ)}" 
+                                           Margin="6,0,0,0" VerticalAlignment="Center" 
+                                           Foreground="{StaticResource DangerBrush}" FontSize="12"
+                                           Visibility="{Binding TienGiamGia, Converter={StaticResource StringToNumberConverter}}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Separator -->
+                        <Border Width="1" Height="36" Background="#E0E0E0"
+                                Margin="0,0,24,0" />
+
+                        <StackPanel Margin="0,0,24,0">
                             <TextBlock Text="Số tiền trả" FontSize="11.5"
                                        Foreground="{StaticResource TextSecondaryBrush}" />
                             <TextBlock Style="{StaticResource MoneyLabel}"
@@ -470,7 +487,7 @@
 
                         <!-- Separator -->
                         <Border Width="1" Height="36" Background="#E0E0E0"
-                                Margin="0,0,32,0" />
+                                Margin="0,0,24,0" />
 
                         <!-- Tiền còn lại (nợ) -->
                         <StackPanel>

@@ -139,6 +139,10 @@ namespace QuanLyGaraOto.Models
                       .HasColumnType("decimal(18,0)")
                       .HasDefaultValue(0);
 
+                entity.Property(e => e.TienGiamGia)
+                      .HasColumnType("decimal(18,0)")
+                      .HasDefaultValue(0);
+
                 // FK: PhieuSuaChua -> Xe (n - 1)
                 entity.HasOne(e => e.Xe)
                       .WithMany(x => x.DanhSachPhieuSuaChua)

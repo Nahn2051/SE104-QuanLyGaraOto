@@ -285,8 +285,10 @@
 
                     <!-- ───── Điện thoại ───── -->
                     <StackPanel Grid.Row="1" Grid.Column="2" Margin="0,0,0,16">
-                        <TextBlock Text="Điện thoại"
-                                   Style="{StaticResource FormLabel}" />
+                        <TextBlock Style="{StaticResource FormLabel}">
+                            <Run Text="Điện thoại" />
+                            <Run Style="{StaticResource RequiredMarker}" />
+                        </TextBlock>
                         <TextBox Style="{StaticResource FormTextBox}"
                                  Text="{Binding DienThoai, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>

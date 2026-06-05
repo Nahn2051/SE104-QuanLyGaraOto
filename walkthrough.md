@@ -83,3 +83,21 @@ Tất cả các file `.xlsx` được xuất ra đều được định dạng t
 1. Mở ứng dụng, vào các mục **Tra Cứu**.
 2. Nháy đúp vào một dòng để xem tính năng Popup chi tiết.
 3. Bấm vào nút `📥 Xuất Excel` để chọn vị trí lưu và kiểm tra file tải về. Mọi tính năng hoạt động rất mượt mà.
+
+## 7. Các Cập Nhật Chốt Sổ Cuối Cùng (Bảo Hành, Giảm Giá & Validation)
+
+### 7.1. Tính Năng Giảm Giá Phiếu Sửa Chữa
+- Bổ sung ô **Giảm giá** trực tiếp trên màn hình lập Phiếu sửa chữa.
+- Tính năng tự động nhận diện giá trị thông minh:
+  - Nhập số thẳng (VD: `50000`): Giảm trực tiếp 50.000 VNĐ.
+  - Nhập phần trăm (VD: `10%`): Tự động tính 10% của Tổng tiền phiếu và giảm số tiền tương ứng.
+- Hiển thị trực quan số tiền giảm trong Lịch sử Tra cứu Phiếu sửa chữa.
+- Logic Hoàn tác (Hủy phiếu) được nâng cấp để cộng/trừ chính xác số tiền nợ sau khi đã khấu trừ giảm giá, đảm bảo dòng tiền tuyệt đối không bị sai lệch.
+
+### 7.2. Tự Động Hóa Tiền Công Bảo Hành
+- Nếu nhân viên chọn loại tiền công là **"Bảo hành"**, hệ thống sẽ **tự động ép Đơn giá của vật tư/phụ tùng đó về 0đ**.
+- Tính năng này giúp gara dễ dàng bảo hành linh kiện cho khách mà không tốn công tính toán hay sửa đơn giá bằng tay, vẫn đảm bảo ghi nhận vật tư đã xuất khỏi kho để bảo hành.
+
+### 7.3. Ràng Buộc Validation Chặt Chẽ
+- **Tiếp nhận xe:** Bắt buộc phải nhập số điện thoại (`DienThoai` Not Null) để Gara dễ dàng liên lạc. Dấu `*` màu đỏ được thêm vào giao diện để cảnh báo trực quan.
+- **Quy định số xe tối đa:** Khi quản lý đổi số xe tối đa trong ngày, hệ thống sẽ chốt chặn query ngay xem hôm nay đã nhận bao nhiêu chiếc. Nếu số muốn đổi `<` số đã nhận hôm nay, hệ thống lập tức báo lỗi và cấm lưu để ngăn chặn lỗi logic quy trình kinh doanh.

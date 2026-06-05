@@ -139,6 +139,7 @@
                                     <DataGridTextColumn Header="Biển số xe" Binding="{Binding Xe.BienSo}" Width="150" FontWeight="Bold" />
                                     <DataGridTextColumn Header="Ngày Sửa Chữa" Binding="{Binding NgaySuaChua, StringFormat=dd/MM/yyyy HH:mm}" Width="*" />
                                     <DataGridTextColumn Header="Tổng Tiền" Binding="{Binding TongTien, StringFormat=N0}" Width="120" Foreground="#2E7D32" FontWeight="Bold" />
+                                    <DataGridTextColumn Header="Giảm Giá" Binding="{Binding TienGiamGia, StringFormat=N0}" Width="100" Foreground="#E65100" FontWeight="Bold" />
                                     <DataGridTextColumn Header="Đã Trả" Binding="{Binding TienThu, StringFormat=N0}" Width="120" Foreground="#1976D2" FontWeight="Bold" />
                                     <DataGridTextColumn Header="Còn Nợ" Binding="{Binding TienNo, StringFormat=N0}" Width="120" Foreground="#D32F2F" FontWeight="Bold" />
                                 </DataGrid.Columns>
@@ -188,6 +189,7 @@
 
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="{Binding SelectedPhieu.TongTien, StringFormat=Tổng tiền: {0:N0} VNĐ}" FontSize="14" Foreground="#2E7D32" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding SelectedPhieu.TienGiamGia, StringFormat=Giảm giá: {0:N0} VNĐ}" FontSize="14" Foreground="#D32F2F" FontWeight="SemiBold" Margin="0,4,0,0" />
                                 <TextBlock Text="{Binding SoTienDaTra, StringFormat=Đã trả: {0:N0} VNĐ}" FontSize="14" Foreground="#1976D2" FontWeight="SemiBold" Margin="0,4,0,0" />
                                 <TextBlock Text="{Binding SoTienNoConLai, StringFormat=Còn nợ: {0:N0} VNĐ}" FontSize="14" Foreground="#D32F2F" FontWeight="SemiBold" Margin="0,4,0,0" />
                             </StackPanel>

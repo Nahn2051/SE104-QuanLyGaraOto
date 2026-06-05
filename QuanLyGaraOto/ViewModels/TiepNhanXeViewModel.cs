@@ -187,29 +187,29 @@ namespace QuanLyGaraOto.ViewModels
                 }
 
                 // 3. Chuẩn hóa & Validation Số điện thoại
-                string? dienThoaiClean = null;
-                if (!string.IsNullOrWhiteSpace(DienThoai))
+                if (string.IsNullOrWhiteSpace(DienThoai))
                 {
-                    // Tước bỏ mọi ký tự lạ, khoảng trắng, dấu gạch ngang... chỉ giữ lại số và dấu '+'
-                    // Regex @"[^\d+]" loại bỏ tất cả những gì không phải chữ số (\d) và không phải dấu cộng (+).
-                    dienThoaiClean = System.Text.RegularExpressions.Regex.Replace(DienThoai, @"[^\d+]", "");
+                    MessageBox.Show("Vui lòng nhập số điện thoại của chủ xe!", "Thiếu thông tin", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
-                    // Chuyển +84 hoặc 84 ở đầu thành 0
-                    if (dienThoaiClean.StartsWith("+84"))
-                    {
-                        dienThoaiClean = "0" + dienThoaiClean.Substring(3);
-                    }
-                    else if (dienThoaiClean.StartsWith("84"))
-                    {
-                        dienThoaiClean = "0" + dienThoaiClean.Substring(2);
-                    }
+                string dienThoaiClean = System.Text.RegularExpressions.Regex.Replace(DienThoai, @"[^\d+]", "");
 
-                    // Validation: Bắt buộc có đúng 10 số và bắt đầu bằng số 0
-                    if (dienThoaiClean.Length != 10 || !dienThoaiClean.StartsWith("0"))
-                    {
-                        MessageBox.Show("Số điện thoại không hợp lệ!\n(Yêu cầu: Bắt đầu bằng 0 hoặc +84 và có đúng 10 chữ số sau khi chuẩn hóa).", "Lỗi dữ liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
+                // Chuyển +84 hoặc 84 ở đầu thành 0
+                if (dienThoaiClean.StartsWith("+84"))
+                {
+                    dienThoaiClean = "0" + dienThoaiClean.Substring(3);
+                }
+                else if (dienThoaiClean.StartsWith("84"))
+                {
+                    dienThoaiClean = "0" + dienThoaiClean.Substring(2);
+                }
+
+                // Validation: Bắt buộc có đúng 10 số và bắt đầu bằng số 0
+                if (dienThoaiClean.Length != 10 || !dienThoaiClean.StartsWith("0"))
+                {
+                    MessageBox.Show("Số điện thoại không hợp lệ!\n(Yêu cầu: Bắt đầu bằng 0 hoặc +84 và có đúng 10 chữ số sau khi chuẩn hóa).", "Lỗi dữ liệu", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
 
                 // --- Tạo record Xe mới ---

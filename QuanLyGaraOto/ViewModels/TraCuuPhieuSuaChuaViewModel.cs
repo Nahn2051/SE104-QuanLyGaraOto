@@ -214,7 +214,7 @@ namespace QuanLyGaraOto.ViewModels
                         // 2. Rollback công nợ (Trừ đi phần nợ đã cộng vào lúc sửa)
                         if (p.Xe != null)
                         {
-                            decimal tienNoDaCong = p.TongTien - p.TienThu;
+                            decimal tienNoDaCong = p.TongTien - p.TienGiamGia - p.TienThu;
                             if (p.Xe.TienNo - tienNoDaCong < 0)
                             {
                                 MessageBox.Show("Không thể hủy phiếu sửa chữa này vì sẽ làm tiền nợ của xe bị âm.\nVui lòng hủy Phiếu Thu Tiền của xe này trước khi hủy phiếu sửa chữa.", "Lỗi dữ liệu công nợ", MessageBoxButton.OK, MessageBoxImage.Error);
