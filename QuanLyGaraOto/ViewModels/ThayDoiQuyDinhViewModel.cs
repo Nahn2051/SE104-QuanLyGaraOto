@@ -134,6 +134,25 @@ namespace QuanLyGaraOto.ViewModels
                 var qd2 = context.ThamSos.FirstOrDefault(ts => ts.TenThamSo == "TiLeDonGiaBan");
                 if (qd2 != null)
                 {
+                    double oldRatio = 1.05;
+                    if (double.TryParse(qd2.GiaTri, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedOldRatio))
+                    {
+                        oldRatio = parsedOldRatio;
+                    }
+
+                    // Cập nhật lại giá bán của tất cả vật tư phụ tùng dựa trên tỉ lệ mới
+                    // Công thức: Giá_Mới = (Giá_Cũ / Tỉ_Lệ_Cũ) * Tỉ_Lệ_Mới
+                    if (oldRatio > 0 && Math.Abs(oldRatio - TiLeDonGiaBan) > 0.0001)
+                    {
+                        var tatCaVatTu = context.VatTuPhuTungs.ToList();
+                        foreach (var vt in tatCaVatTu)
+                        {
+                            decimal newPrice = (vt.DonGia / (decimal)oldRatio) * (decimal)TiLeDonGiaBan;
+                            // Phải làm tròn về 0 chữ số thập phân vì database cấu hình cột DonGia là decimal(18,0)
+                            vt.DonGia = Math.Round(newPrice, 0);
+                        }
+                    }
+
                     // Chuyển sang string, giữ định dạng số thập phân chuẩn (tránh lỗi văn hóa dấu phẩy)
                     qd2.GiaTri = TiLeDonGiaBan.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 }
