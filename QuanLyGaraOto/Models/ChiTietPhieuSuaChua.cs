@@ -23,6 +23,9 @@ namespace QuanLyGaraOto.Models
 
         public int SoLuong { get; set; } = 1;
 
+        [Column("TienCong", TypeName = "decimal(18,0)")]
+        public decimal ChiPhiTienCong { get; set; } = 0;
+
         [Column(TypeName = "decimal(18,0)")]
         public decimal DonGia { get; set; }
 

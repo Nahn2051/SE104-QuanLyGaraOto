@@ -161,7 +161,8 @@ namespace QuanLyGaraOto.ViewModels
                     // 1. Tạo Phiếu Nhập
                     var phieuNhap = new PhieuNhap
                     {
-                        NgayNhap = NgayNhap
+                        NgayNhap = NgayNhap,
+                        TongTien = TongTien
                     };
                     context.PhieuNhaps.Add(phieuNhap);
                     context.SaveChanges(); // Lấy MaPhieuNhap

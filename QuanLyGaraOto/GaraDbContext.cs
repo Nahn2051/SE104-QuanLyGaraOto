@@ -217,6 +217,10 @@ namespace QuanLyGaraOto.Models
 
                 entity.Property(e => e.NgayNhap)
                       .IsRequired();
+
+                entity.Property(e => e.TongTien)
+                      .HasColumnType("decimal(18,0)")
+                      .HasDefaultValue(0);
             });
 
             // -----------------------------------------------------------------

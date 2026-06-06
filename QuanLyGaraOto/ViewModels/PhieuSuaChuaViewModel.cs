@@ -336,6 +336,7 @@ namespace QuanLyGaraOto.ViewModels
                             MaVTPT = row.SelectedVatTu?.MaVTPT,
                             MaTienCong = row.SelectedTienCong?.MaTienCong,
                             SoLuong = row.SoLuong,
+                            ChiPhiTienCong = row.SelectedTienCong?.DonGia ?? 0,
                             DonGia = row.DonGia,
                             ThanhTien = row.ThanhTien
                         };
