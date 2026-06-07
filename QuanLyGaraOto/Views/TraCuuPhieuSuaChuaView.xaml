@@ -160,7 +160,7 @@
 
         <!-- DIALOG XEM CHI TIẾT -->
         <Grid Visibility="{Binding IsPopupOpen, Converter={StaticResource BoolToVis}}" Background="#80000000" Panel.ZIndex="100">
-            <Border Background="White" CornerRadius="16" Width="800" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24">
+            <Border Background="White" CornerRadius="16" Width="950" Height="500" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="24">
                 <Border.Effect>
                     <DropShadowEffect Color="Black" BlurRadius="30" Opacity="0.3" ShadowDepth="5" />
                 </Border.Effect>
@@ -225,9 +225,10 @@
                             <DataGridTextColumn Header="Nội Dung" Binding="{Binding NoiDungSuaChua}" Width="2*" />
                             <DataGridTextColumn Header="Vật Tư" Binding="{Binding VatTuPhuTung.TenVTPT}" Width="1.5*" />
                             <DataGridTextColumn Header="SL" Binding="{Binding SoLuong}" Width="60" />
-                            <DataGridTextColumn Header="Đơn Giá" Binding="{Binding DonGia, StringFormat=N0}" Width="1*" />
+                            <DataGridTextColumn Header="Đơn Giá" Binding="{Binding DonGia, StringFormat=N0}" Width="110" />
                             <DataGridTextColumn Header="Tiền Công" Binding="{Binding TienCong.TenTienCong}" Width="1.5*" />
-                            <DataGridTextColumn Header="Thành Tiền" Binding="{Binding ThanhTien, StringFormat=N0}" Width="1*" FontWeight="Bold" Foreground="#2E7D32"/>
+                            <DataGridTextColumn Header="Phí Tiền Công" Binding="{Binding ChiPhiTienCong, StringFormat=N0}" Width="115" />
+                            <DataGridTextColumn Header="Thành Tiền" Binding="{Binding ThanhTien, StringFormat=N0}" Width="115" FontWeight="Bold" Foreground="#2E7D32"/>
                         </DataGrid.Columns>
                     </DataGrid>
 

@@ -291,8 +291,8 @@ namespace QuanLyGaraOto.ViewModels
                 ws.Cell(1, 1).Value = $"CHI TIẾT PHIẾU SỬA CHỮA #{SelectedPhieu.MaPhieuSuaChua}";
                 ws.Cell(1, 1).Style.Font.Bold = true;
                 ws.Cell(1, 1).Style.Font.FontSize = 16;
-                ws.Range(1, 1, 1, 6).Merge();
-                ws.Range(1, 1, 1, 6).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+                ws.Range(1, 1, 1, 7).Merge();
+                ws.Range(1, 1, 1, 7).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
 
                 ws.Cell(3, 1).Value = "Biển số xe:"; ws.Cell(3, 1).Style.Font.Bold = true;
                 ws.Cell(3, 2).Value = SelectedPhieu.Xe?.BienSo;
@@ -304,7 +304,7 @@ namespace QuanLyGaraOto.ViewModels
                 ws.Cell(5, 2).Value = SelectedPhieu.TongTien;
                 ws.Cell(5, 2).Style.NumberFormat.Format = "#,##0";
 
-                var headers = new[] { "Nội Dung", "Vật Tư Phụ Tùng", "Số Lượng", "Đơn Giá", "Tiền Công", "Thành Tiền" };
+                var headers = new[] { "Nội Dung", "Vật Tư Phụ Tùng", "Số Lượng", "Đơn Giá", "Tiền Công", "Phí Tiền Công", "Thành Tiền" };
                 for (int i = 0; i < headers.Length; i++)
                 {
                     ws.Cell(7, i + 1).Value = headers[i];
@@ -322,10 +322,12 @@ namespace QuanLyGaraOto.ViewModels
                     ws.Cell(row, 4).Value = ct.DonGia;
                     ws.Cell(row, 4).Style.NumberFormat.Format = "#,##0";
                     ws.Cell(row, 5).Value = ct.TienCong?.TenTienCong ?? "";
-                    ws.Cell(row, 6).Value = ct.ThanhTien;
+                    ws.Cell(row, 6).Value = ct.ChiPhiTienCong;
                     ws.Cell(row, 6).Style.NumberFormat.Format = "#,##0";
+                    ws.Cell(row, 7).Value = ct.ThanhTien;
+                    ws.Cell(row, 7).Style.NumberFormat.Format = "#,##0";
 
-                    for (int c = 1; c <= 6; c++)
+                    for (int c = 1; c <= 7; c++)
                         ws.Cell(row, c).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
                     
                     row++;

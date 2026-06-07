@@ -393,6 +393,10 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
+                            <!-- Phí tiền công (read-only, hiển thị tự động theo Tiền công đã chọn) -->
+                            <DataGridTextColumn Header="Phí tiền công" Width="110" IsReadOnly="True"
+                                                Binding="{Binding SelectedTienCong.DonGia, StringFormat=N0}" />
+
                             <!-- Số lượng -->
                             <DataGridTextColumn Header="SL" Width="60"
                                                 Binding="{Binding SoLuong,

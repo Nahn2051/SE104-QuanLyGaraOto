@@ -186,7 +186,7 @@ namespace QuanLyGaraOto.ViewModels
                         if (vatTuDb != null)
                         {
                             vatTuDb.SoLuongTon += row.SoLuong; // Cộng dồn số lượng
-                            vatTuDb.DonGia = row.DonGia * tiLeDonGiaBan; // Giá bán = Giá nhập * Tỉ lệ
+                            vatTuDb.DonGia = Math.Round(row.DonGia * tiLeDonGiaBan, 0); // Giá bán = Giá nhập * Tỉ lệ
                         }
                     }
 
@@ -237,8 +237,22 @@ namespace QuanLyGaraOto.ViewModels
                 {
                     if (value != null)
                     {
-                        // Lấy đơn giá cũ làm gợi ý (nhưng người dùng có thể gõ sửa lại)
-                        DonGia = value.DonGia;
+                        // Lấy đơn giá nhập cũ làm gợi ý bằng cách chia ngược cho Tỉ lệ đơn giá bán
+                        try
+                        {
+                            using var context = new GaraDbContext();
+                            var thamSoTiLe = context.ThamSos.FirstOrDefault(t => t.TenThamSo == "TiLeDonGiaBan");
+                            decimal tiLe = 1.05m;
+                            if (thamSoTiLe != null && decimal.TryParse(thamSoTiLe.GiaTri, out decimal parsedTiLe))
+                            {
+                                tiLe = parsedTiLe;
+                            }
+                            DonGia = Math.Round(value.DonGia / tiLe, 0);
+                        }
+                        catch
+                        {
+                            DonGia = 0;
+                        }
                     }
                 }
             }

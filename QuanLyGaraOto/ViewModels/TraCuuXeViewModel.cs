@@ -166,18 +166,46 @@ namespace QuanLyGaraOto.ViewModels
 
         private void XuatExcel()
         {
-            var mapping = new System.Collections.Generic.Dictionary<string, string>
-            {
-                { "BienSo", "Biển số" },
-                { "TenChuXe", "Tên chủ xe" },
-                { "DienThoai", "Điện thoại" },
-                { "Email", "Email" },
-                { "DiaChi", "Địa chỉ" },
-                { "NgayTiepNhan", "Ngày tiếp nhận" },
-                { "TienNo", "Tiền nợ" }
-            };
+            if (!DanhSachXe.Any()) return;
 
-            QuanLyGaraOto.Services.ExcelExportService.ExportListToExcel(DanhSachXe, "TraCuuXe", "Báo cáo Tra Cứu Xe", mapping);
+            QuanLyGaraOto.Services.ExcelExportService.ExportCustomExcel("TraCuuXe", wb =>
+            {
+                var ws = wb.Worksheets.Add("TraCuuXe");
+                ws.Cell(1, 1).Value = "BÁO CÁO TRA CỨU XE";
+                ws.Cell(1, 1).Style.Font.Bold = true;
+                ws.Cell(1, 1).Style.Font.FontSize = 16;
+                ws.Range(1, 1, 1, 5).Merge();
+                ws.Range(1, 1, 1, 5).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                var headers = new[] { "STT", "Biển số", "Hiệu xe", "Tên chủ xe", "Tiền nợ" };
+                for (int i = 0; i < headers.Length; i++)
+                {
+                    ws.Cell(3, i + 1).Value = headers[i];
+                    ws.Cell(3, i + 1).Style.Font.Bold = true;
+                    ws.Cell(3, i + 1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.LightGray;
+                    ws.Cell(3, i + 1).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                }
+
+                int row = 4;
+                int stt = 1;
+                foreach (var x in DanhSachXe)
+                {
+                    ws.Cell(row, 1).Value = stt++;
+                    ws.Cell(row, 2).Value = x.BienSo;
+                    ws.Cell(row, 3).Value = x.HieuXe?.TenHieuXe;
+                    ws.Cell(row, 4).Value = x.TenChuXe;
+                    ws.Cell(row, 5).Value = x.TienNo;
+                    ws.Cell(row, 5).Style.NumberFormat.Format = "#,##0";
+
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        ws.Cell(row, i).Style.Border.OutsideBorder = ClosedXML.Excel.XLBorderStyleValues.Thin;
+                    }
+                    row++;
+                }
+
+                ws.Columns().AdjustToContents();
+            });
         }
 
         private void XuatExcelChiTiet()

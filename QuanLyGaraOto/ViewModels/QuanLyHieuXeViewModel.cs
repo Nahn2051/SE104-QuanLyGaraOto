@@ -149,6 +149,10 @@ namespace QuanLyGaraOto.ViewModels
                     row++;
                 }
                 ws.Columns().AdjustToContents();
+                
+                // Đảm bảo các cột đủ rộng để hiển thị tiêu đề gộp
+                if (ws.Column(1).Width < 15) ws.Column(1).Width = 15;
+                if (ws.Column(2).Width < 25) ws.Column(2).Width = 25;
             });
         }
 
